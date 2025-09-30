@@ -6,13 +6,15 @@
 <script type="module">
 import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
 
-// Ambil parameter fileId dari URL
+// Ambil fileId dari URL secara aman
 function getFileIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
+  // window.location.search selalu ada parameter setelah "?"
+  const search = window.location.search || "";
+  const params = new URLSearchParams(search);
   return params.get("fileId");
 }
 
-// Menulis log ke kotak log
+// Tulis log ke kotak log
 function writeLog(message, type="info") {
   const logBox = document.getElementById("logBox");
   const time = new Date().toLocaleTimeString();
@@ -21,7 +23,7 @@ function writeLog(message, type="info") {
   logBox.scrollTop = logBox.scrollHeight;
 }
 
-// Fungsi untuk toggle tombol loading
+// Toggle tombol loading
 function setLoading(isLoading) {
   const btn = document.getElementById("decompressBtn");
   if (isLoading) {
@@ -33,12 +35,11 @@ function setLoading(isLoading) {
   }
 }
 
-// Download & dekompresi ZIP
+// Download dan dekompresi ZIP
 async function downloadAndDecompress() {
   const fileId = getFileIdFromURL();
   const password = document.getElementById('password').value.trim();
 
-  // Validasi URL/fileId dan password
   if (!fileId) {
     writeLog("URL kosong atau ID file tidak valid!", "error");
     return;
@@ -61,7 +62,7 @@ async function downloadAndDecompress() {
 
   try {
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Gagal download file. Pastikan URL valid dan file publik.");
+    if (!response.ok) throw new Error("Gagal download file. Pastikan file publik.");
 
     const blob = await response.blob();
     const reader = new zip.ZipReader(new zip.BlobReader(blob), { password });
@@ -98,19 +99,16 @@ async function downloadAndDecompress() {
 // Download ZIP mentah langsung
 function downloadZIPDirect() {
   const fileId = getFileIdFromURL();
-
-  // Validasi URL/fileId
   if (!fileId) {
     writeLog("URL kosong atau ID file tidak valid!", "error");
     return;
   }
-
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
   window.open(url, "_blank");
   writeLog("Memulai download ZIP langsung...");
 }
 
-// Tampilkan fileId & URL di halaman
+// Tampilkan URL file di halaman
 window.addEventListener('DOMContentLoaded', () => {
   const fileId = getFileIdFromURL();
   const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
@@ -120,7 +118,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <style>
-/* Body & container */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #f4f7f9, #e8eef3);
@@ -140,11 +137,9 @@ body {
   width: 100%;
 }
 
-/* Headings & text */
 h2 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
 p, ol { line-height: 1.6; color: #555; }
 
-/* Input fields */
 input[type="password"], input[type="text"] {
   width: 100%;
   padding: 12px;
@@ -155,7 +150,6 @@ input[type="password"], input[type="text"] {
   font-size: 1em;
 }
 
-/* Tombol utama */
 #decompressBtn {
   width: 100%;
   font-size: 1.2em;
@@ -173,7 +167,6 @@ input[type="password"], input[type="text"] {
   transform: scale(1.05);
 }
 
-/* Tombol alternatif */
 #downloadBtn {
   width: 100%;
   font-size: 1em;
@@ -191,7 +184,6 @@ input[type="password"], input[type="text"] {
   transform: scale(1.03);
 }
 
-/* Kotak log */
 textarea {
   width: 100%;
   height: 150px;
@@ -205,17 +197,9 @@ textarea {
   color: #333;
 }
 
-/* Fallback link */
-#fallbackLink {
-  margin-top: 12px;
-  display: none;
-}
-#fallbackLink a {
-  color: #e74c3c;
-  text-decoration: underline;
-}
+#fallbackLink { margin-top: 12px; display: none; }
+#fallbackLink a { color: #e74c3c; text-decoration: underline; }
 
-/* Animasi titik-titik loading */
 @keyframes blink {
   0%, 20% { opacity: 0; }
   50% { opacity: 1; }
@@ -235,31 +219,31 @@ textarea {
 </style>
 </head>
 <body>
-  <div class="container">
-    <h2>ZIP Downloader</h2>
-    <p>Prosedur penggunaan:</p>
-    <ol>
-      <li>Scan QR Code yang diberikan.</li>
-      <li>Masukkan password ZIP pada kolom di bawah.</li>
-      <li>Pilih ingin mendekompresi langsung di browser atau download ZIP mentah.</li>
-      <li>Periksa kotak log untuk status atau error.</li>
-    </ol>
+<div class="container">
+  <h2>ZIP Downloader</h2>
+  <p>Prosedur penggunaan:</p>
+  <ol>
+    <li>Scan QR Code.</li>
+    <li>Masukkan password ZIP.</li>
+    <li>Pilih "Download & Dekompresi" atau "Download ZIP Mentah".</li>
+    <li>Lihat kotak log untuk status/error.</li>
+  </ol>
 
-    <p><strong>File ID dari QR:</strong> <span id="fileIdDisplay">-</span></p>
-    <p><strong>URL file ZIP:</strong></p>
-    <input type="text" id="fileUrlDisplay" readonly>
+  <p><strong>File ID:</strong> <span id="fileIdDisplay">-</span></p>
+  <p><strong>URL file ZIP:</strong></p>
+  <input type="text" id="fileUrlDisplay" readonly>
 
-    <input type="password" id="password" placeholder="Masukkan password ZIP di sini">
+  <input type="password" id="password" placeholder="Masukkan password ZIP di sini">
 
-    <button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
-    <button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
+  <button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
+  <button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
 
-    <p><strong>Log:</strong></p>
-    <textarea id="logBox" readonly></textarea>
+  <p><strong>Log:</strong></p>
+  <textarea id="logBox" readonly></textarea>
 
-    <div id="fallbackLink">
-      <p>Jika browser tidak mendukung dekompresi ZIP, silakan download langsung file ZIP dari <a id="directDownload" href="#" target="_blank">link ini</a>.</p>
-    </div>
+  <div id="fallbackLink">
+    <p>Browser tidak mendukung dekompresi ZIP? Download langsung file ZIP dari <a id="directDownload" href="#" target="_blank">link ini</a>.</p>
   </div>
+</div>
 </body>
 </html>
