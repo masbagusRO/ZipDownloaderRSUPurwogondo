@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ZIP Downloader</title>
+<script type="module">
+import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
+
+// Ambil parameter fileId dari URL
+function getFileIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("fileId");
+}
+
+// Menulis log ke kotak log
+function writeLog(message, type="info") {
+  const logBox = document.getElementById("logBox");
+  const time = new Date().toLocaleTimeString();
+  const prefix = type === "error" ? "[ERROR]" : type === "success" ? "[OK]" : "[INFO]";
+  logBox.value += `${prefix} ${time} - ${message}\n`;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+// Fungsi untuk toggle tombol loading
+function setLoading(isLoading) {
+  const btn = document.getElementById("decompressBtn");
+  if (isLoading) {
+    btn.disabled = true;
+    btn.innerHTML = 'Memproses<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Download & Dekompresi';
+  }
+}
+
+// Download & dekompresi ZIP
+async function downloadAndDecompress() {
+  const fileId = getFileIdFromURL();
+  const password = document.getElementById('password').value.trim();
+
+  // ===== VALIDASI =====
+  if (!fileId) {
+    writeLog("URL kosong atau ID file tidak valid!", "error");
+    return;
+  }
+  if (!password) {
+    writeLog("Masukkan password ZIP!", "error");
+    return;
+  }
+  // ====================
+
+  setLoading(true);
+  const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
+  writeLog("Memulai download file...");
+
+  if (!window.fetch || !window.Blob || !window.Uint8Array) {
+    writeLog("Browser Anda tidak mendukung dekompresi ZIP di halaman ini.", "error");
+    document.getElementById("fallbackLink").style.display = "block";
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Gagal download file. Pastikan URL valid dan file publik.");
+
+    const blob = await response.blob();
+    const reader = new zip.ZipReader(new zip.BlobReader(blob), { password });
+    const entries = await reader.getEntries();
+
+    if (entries.length === 0) {
+      writeLog("ZIP kosong atau password salah!", "error");
+      await reader.close();
+      setLoading(false);
+      return;
+    }
+
+    for (const entry of entries) {
+      if (!entry.directory) {
+        const fileData = await entry.getData(new zip.Uint8ArrayWriter());
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([fileData]));
+        a.download = entry.filename;
+        a.click();
+        writeLog(`File "${entry.filename}" berhasil di-download.`, "success");
+      }
+    }
+
+    await reader.close();
+    writeLog("Semua file berhasil di-download!", "success");
+  } catch (err) {
+    writeLog("Error: " + err.message, "error");
+    document.getElementById("fallbackLink").style.display = "block";
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Download ZIP mentah langsung
+function downloadZIPDirect() {
+  const fileId = getFileIdFromURL();
+
+  // ===== VALIDASI =====
+  if (!fileId) {
+    writeLog("URL kosong atau ID file tidak valid!", "error");
+    return;
+  }
+  // ====================
+
+  const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
+  window.open(url, "_blank");
+  writeLog("Memulai download ZIP langsung...");
+}
+
+// Tampilkan fileId & URL di halaman
+window.addEventListener('DOMContentLoaded', () => {
+  const fileId = getFileIdFromURL();
+  const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+  document.getElementById("fileIdDisplay").textContent = fileId || "-";
+  document.getElementById("fileUrlDisplay").value = zipURL;
+  document.getElementById("directDownload").href = zipURL;
+});
+</script>
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; color: #333; padding: 20px; max-width: 600px; margin: auto; }
+h2 { margin-bottom: 5px; color: #2c3e50; }
+p, ol { line-height: 1.6; }
+input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
+button { border-radius: 8px; cursor: pointer; transition: background 0.3s, transform 0.2s; border: none; }
+
+/* Tombol utama */
+#decompressBtn {
+  width: 100%;
+  font-size: 1.2em;
+  padding: 15px;
+  background-color: #e67e22;
+  color: white;
+  margin-top: 10px;
+}
+#decompressBtn:hover { background-color: #d35400; transform: scale(1.05); }
+
+/* Tombol alternatif */
+#downloadBtn {
+  width: 100%;
+  font-size: 1em;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  margin-top: 5px;
+}
+#downloadBtn:hover { background-color: #2980b9; transform: scale(1.03); }
+
+/* Kotak log */
+textarea { width: 100%; height: 150px; margin-top: 10px; resize: none; border-radius: 5px; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
+
+/* Fallback link */
+#fallbackLink { margin-top: 10px; display: none; }
+#fallbackLink a { color: #e74c3c; text-decoration: underline; }
+
+/* Animasi titik-titik loading */
+@keyframes blink {
+  0%, 20% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.loading-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 2px;
+  background-color: white;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+<h2>ZIP Downloader</h2>
+<p>Prosedur penggunaan:</p>
+<ol>
+<li>Scan QR Code yang diberikan.</li>
+<li>Masukkan password ZIP pada kolom di bawah.</li>
+<li>Pilih ingin mendekompresi langsung di browser atau download ZIP mentah.</li>
+<li>Periksa kotak log untuk status atau error.</li>
+</ol>
+
+<p><strong>File ID dari QR:</strong> <span id="fileIdDisplay">-</span></p>
+
+<p><strong>URL file ZIP:</strong></p>
+<input type="text" id="fileUrlDisplay" readonly>
+
+<input type="password" id="password" placeholder="Masukkan password ZIP di sini">
+
+<button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
+<button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
+
+<p><strong>Log:</strong></p>
+<textarea id="logBox" readonly></textarea>
+
+<div id="fallbackLink">
+<p>Jika browser tidak mendukung dekompresi ZIP, silakan download langsung file ZIP dari <a id="directDownload" href="#" target="_blank">link ini</a>.</p>
+</div>
+</body>
+</html>
