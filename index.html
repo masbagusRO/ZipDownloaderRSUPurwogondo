@@ -38,7 +38,7 @@ async function downloadAndDecompress() {
   const fileId = getFileIdFromURL();
   const password = document.getElementById('password').value.trim();
 
-  // ===== VALIDASI =====
+  // Validasi URL/fileId dan password
   if (!fileId) {
     writeLog("URL kosong atau ID file tidak valid!", "error");
     return;
@@ -47,7 +47,6 @@ async function downloadAndDecompress() {
     writeLog("Masukkan password ZIP!", "error");
     return;
   }
-  // ====================
 
   setLoading(true);
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
@@ -100,12 +99,11 @@ async function downloadAndDecompress() {
 function downloadZIPDirect() {
   const fileId = getFileIdFromURL();
 
-  // ===== VALIDASI =====
+  // Validasi URL/fileId
   if (!fileId) {
     writeLog("URL kosong atau ID file tidak valid!", "error");
     return;
   }
-  // ====================
 
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
   window.open(url, "_blank");
@@ -122,11 +120,40 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <style>
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; color: #333; padding: 20px; max-width: 600px; margin: auto; }
-h2 { margin-bottom: 5px; color: #2c3e50; }
-p, ol { line-height: 1.6; }
-input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
-button { border-radius: 8px; cursor: pointer; transition: background 0.3s, transform 0.2s; border: none; }
+/* Body & container */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #f4f7f9, #e8eef3);
+  color: #333;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Headings & text */
+h2 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+p, ol { line-height: 1.6; color: #555; }
+
+/* Input fields */
+input[type="password"], input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
 
 /* Tombol utama */
 #decompressBtn {
@@ -136,8 +163,15 @@ button { border-radius: 8px; cursor: pointer; transition: background 0.3s, trans
   background-color: #e67e22;
   color: white;
   margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-#decompressBtn:hover { background-color: #d35400; transform: scale(1.05); }
+#decompressBtn:hover {
+  background-color: #d35400;
+  transform: scale(1.05);
+}
 
 /* Tombol alternatif */
 #downloadBtn {
@@ -146,16 +180,40 @@ button { border-radius: 8px; cursor: pointer; transition: background 0.3s, trans
   padding: 12px;
   background-color: #3498db;
   color: white;
-  margin-top: 5px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-#downloadBtn:hover { background-color: #2980b9; transform: scale(1.03); }
+#downloadBtn:hover {
+  background-color: #2980b9;
+  transform: scale(1.03);
+}
 
 /* Kotak log */
-textarea { width: 100%; height: 150px; margin-top: 10px; resize: none; border-radius: 5px; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
+textarea {
+  width: 100%;
+  height: 150px;
+  margin-top: 12px;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 12px;
+  font-family: monospace;
+  background: #f1f3f6;
+  color: #333;
+}
 
 /* Fallback link */
-#fallbackLink { margin-top: 10px; display: none; }
-#fallbackLink a { color: #e74c3c; text-decoration: underline; }
+#fallbackLink {
+  margin-top: 12px;
+  display: none;
+}
+#fallbackLink a {
+  color: #e74c3c;
+  text-decoration: underline;
+}
 
 /* Animasi titik-titik loading */
 @keyframes blink {
@@ -165,9 +223,9 @@ textarea { width: 100%; height: 150px; margin-top: 10px; resize: none; border-ra
 }
 .loading-dot {
   display: inline-block;
-  width: 5px;
-  height: 5px;
-  margin-left: 2px;
+  width: 6px;
+  height: 6px;
+  margin-left: 3px;
   background-color: white;
   border-radius: 50%;
   animation: blink 1s infinite;
@@ -177,30 +235,31 @@ textarea { width: 100%; height: 150px; margin-top: 10px; resize: none; border-ra
 </style>
 </head>
 <body>
-<h2>ZIP Downloader</h2>
-<p>Prosedur penggunaan:</p>
-<ol>
-<li>Scan QR Code yang diberikan.</li>
-<li>Masukkan password ZIP pada kolom di bawah.</li>
-<li>Pilih ingin mendekompresi langsung di browser atau download ZIP mentah.</li>
-<li>Periksa kotak log untuk status atau error.</li>
-</ol>
+  <div class="container">
+    <h2>ZIP Downloader</h2>
+    <p>Prosedur penggunaan:</p>
+    <ol>
+      <li>Scan QR Code yang diberikan.</li>
+      <li>Masukkan password ZIP pada kolom di bawah.</li>
+      <li>Pilih ingin mendekompresi langsung di browser atau download ZIP mentah.</li>
+      <li>Periksa kotak log untuk status atau error.</li>
+    </ol>
 
-<p><strong>File ID dari QR:</strong> <span id="fileIdDisplay">-</span></p>
+    <p><strong>File ID dari QR:</strong> <span id="fileIdDisplay">-</span></p>
+    <p><strong>URL file ZIP:</strong></p>
+    <input type="text" id="fileUrlDisplay" readonly>
 
-<p><strong>URL file ZIP:</strong></p>
-<input type="text" id="fileUrlDisplay" readonly>
+    <input type="password" id="password" placeholder="Masukkan password ZIP di sini">
 
-<input type="password" id="password" placeholder="Masukkan password ZIP di sini">
+    <button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
+    <button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
 
-<button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
-<button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
+    <p><strong>Log:</strong></p>
+    <textarea id="logBox" readonly></textarea>
 
-<p><strong>Log:</strong></p>
-<textarea id="logBox" readonly></textarea>
-
-<div id="fallbackLink">
-<p>Jika browser tidak mendukung dekompresi ZIP, silakan download langsung file ZIP dari <a id="directDownload" href="#" target="_blank">link ini</a>.</p>
-</div>
+    <div id="fallbackLink">
+      <p>Jika browser tidak mendukung dekompresi ZIP, silakan download langsung file ZIP dari <a id="directDownload" href="#" target="_blank">link ini</a>.</p>
+    </div>
+  </div>
 </body>
 </html>
