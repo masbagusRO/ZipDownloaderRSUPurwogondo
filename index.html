@@ -53,7 +53,7 @@ button {
 
 textarea {
   width: 100%;
-  height: 120px;
+  height: 150px;
   margin-top: 12px;
   resize: none;
   border-radius: 6px;
@@ -64,6 +64,8 @@ textarea {
   color: #333;
 }
 </style>
+<!-- zip.js CDN (UMD version, global variable: zip) -->
+<script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
 </head>
 <body>
 <div class="container">
@@ -83,45 +85,38 @@ textarea {
 
   <input type="password" id="password" placeholder="Masukkan password ZIP">
 
-  <button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
-  <button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
+  <button id="decompressBtn">Download & Dekompresi</button>
+  <button id="downloadBtn">Download ZIP Mentah</button>
 
   <p><strong>Log:</strong></p>
   <textarea id="logBox" readonly></textarea>
 </div>
-  <script type="module">
-// Import zip.js dari CDN
-import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
 
+<script>
 // Ambil fileId dari URL
 function getFileIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("fileId");
 }
 
-// Tulis log ke kotak log
-function writeLog(message, type="info") {
-  const logBox = document.getElementById("logBox");
+// Tulis log
+function writeLog(msg, type="info") {
+  const logBox = document.getElementById('logBox');
   const time = new Date().toLocaleTimeString();
   const prefix = type === "error" ? "[ERROR]" : type === "success" ? "[OK]" : "[INFO]";
-  logBox.value += `${prefix} ${time} - ${message}\n`;
+  logBox.value += `${prefix} ${time} - ${msg}\n`;
   logBox.scrollTop = logBox.scrollHeight;
 }
 
 // Toggle tombol loading
 function setLoading(isLoading) {
   const btn = document.getElementById("decompressBtn");
-  if (isLoading) {
-    btn.disabled = true;
-    btn.textContent = "Memproses...";
-  } else {
-    btn.disabled = false;
-    btn.textContent = "Download & Dekompresi";
-  }
+  btn.disabled = isLoading;
+  btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
 }
 
-// Fungsi utama: download & dekompresi ZIP
-window.downloadAndDecompress = async function() {
+// Download & dekompresi ZIP
+function downloadAndDecompress() {
   const fileId = getFileIdFromURL();
   const password = document.getElementById('password').value.trim();
 
@@ -129,47 +124,44 @@ window.downloadAndDecompress = async function() {
   if (!password) { writeLog("Masukkan password ZIP!", "error"); return; }
 
   setLoading(true);
-
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
   writeLog("Memulai download file ZIP dari Google Drive...");
 
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Gagal download file. Pastikan file publik.");
-    const blob = await response.blob();
-
+  fetch(url).then(resp => {
+    if (!resp.ok) throw new Error("Gagal download file. Pastikan file publik.");
+    return resp.blob();
+  }).then(blob => {
     const reader = new zip.ZipReader(new zip.BlobReader(blob), { password });
-    const entries = await reader.getEntries();
-
-    if (entries.length === 0) {
-      writeLog("ZIP kosong atau password salah!", "error");
-      await reader.close();
-      setLoading(false);
-      return;
-    }
-
-    for (const entry of entries) {
-      if (!entry.directory) {
-        const fileData = await entry.getData(new zip.Uint8ArrayWriter());
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([fileData]));
-        a.download = entry.filename;
-        a.click();
-        writeLog(`File "${entry.filename}" berhasil di-download.`, "success");
+    return reader.getEntries().then(entries => {
+      if (entries.length === 0) {
+        writeLog("ZIP kosong atau password salah!", "error");
+        reader.close();
+        setLoading(false);
+        return;
       }
-    }
-
-    await reader.close();
-    writeLog("Semua file berhasil di-download!", "success");
-  } catch (err) {
+      entries.forEach(entry => {
+        if (!entry.directory) {
+          entry.getData(new zip.Uint8ArrayWriter()).then(fileData => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([fileData]));
+            a.download = entry.filename;
+            a.click();
+            writeLog(`File "${entry.filename}" berhasil di-download.`, "success");
+          });
+        }
+      });
+      reader.close();
+      writeLog("Semua file berhasil di-download!", "success");
+      setLoading(false);
+    });
+  }).catch(err => {
     writeLog("Error: " + err.message, "error");
-  } finally {
     setLoading(false);
-  }
+  });
 }
 
-// Tombol download ZIP mentah
-window.downloadZIPDirect = function() {
+// Download ZIP mentah
+function downloadZIPDirect() {
   const fileId = getFileIdFromURL();
   if (!fileId) { writeLog("URL kosong atau ID file tidak valid!", "error"); return; }
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
@@ -177,13 +169,15 @@ window.downloadZIPDirect = function() {
   writeLog("Memulai download ZIP langsung...");
 }
 
-// Set fileId & URL di halaman saat DOM siap
+// Set fileId & URL di halaman, dan bind tombol
 window.addEventListener('DOMContentLoaded', () => {
   const fileId = getFileIdFromURL();
   document.getElementById('fileIdDisplay').textContent = fileId || "-";
-  const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
-  document.getElementById('fileUrlDisplay').value = zipURL;
+  document.getElementById('fileUrlDisplay').value = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+
+  document.getElementById('decompressBtn').onclick = downloadAndDecompress;
+  document.getElementById('downloadBtn').onclick = downloadZIPDirect;
 });
-  </script>
+</script>
 </body>
 </html>
