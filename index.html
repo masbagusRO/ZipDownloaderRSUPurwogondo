@@ -64,49 +64,6 @@ textarea {
   color: #333;
 }
 </style>
-<script>
-// Fungsi ambil fileId dari URL
-function getFileIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("fileId");
-}
-
-// Tampilkan fileId dan URL Google Drive di halaman
-window.addEventListener('DOMContentLoaded', () => {
-  const fileId = getFileIdFromURL();
-  document.getElementById('fileIdDisplay').textContent = fileId || "-";
-  const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
-  document.getElementById('fileUrlDisplay').value = zipURL;
-});
-
-// Log helper
-function writeLog(msg) {
-  const logBox = document.getElementById('logBox');
-  logBox.value += `[INFO] ${msg}\n`;
-  logBox.scrollTop = logBox.scrollHeight;
-}
-
-// Tombol Download & Dekompresi (dummy untuk percobaan)
-function downloadAndDecompress() {
-  const pwd = document.getElementById('password').value.trim();
-  if (!pwd) {
-    writeLog("Masukkan password ZIP terlebih dahulu!");
-    return;
-  }
-  writeLog("Tombol Download & Dekompresi ditekan (belum diimplementasikan)");
-}
-
-// Tombol Download ZIP mentah
-function downloadZIPDirect() {
-  const url = document.getElementById('fileUrlDisplay').value;
-  if (!url || url === "-") {
-    writeLog("URL file kosong, tidak bisa download.");
-    return;
-  }
-  window.open(url, "_blank");
-  writeLog("Memulai download ZIP langsung...");
-}
-</script>
 </head>
 <body>
 <div class="container">
@@ -132,6 +89,7 @@ function downloadZIPDirect() {
   <p><strong>Log:</strong></p>
   <textarea id="logBox" readonly></textarea>
 </div>
+
 <script type="module">
 // Import zip.js dari CDN
 import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
@@ -164,7 +122,7 @@ function setLoading(isLoading) {
 }
 
 // Fungsi utama: download & dekompresi ZIP
-export async function downloadAndDecompress() {
+async function downloadAndDecompress() {
   const fileId = getFileIdFromURL();
   const password = document.getElementById('password').value.trim();
 
@@ -212,7 +170,7 @@ export async function downloadAndDecompress() {
 }
 
 // Tombol download ZIP mentah
-export function downloadZIPDirect() {
+function downloadZIPDirect() {
   const fileId = getFileIdFromURL();
   if (!fileId) { writeLog("URL kosong atau ID file tidak valid!", "error"); return; }
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
