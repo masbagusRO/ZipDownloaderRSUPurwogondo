@@ -2,13 +2,137 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Test File ID</title>
+<title>ZIP Downloader</title>
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  color: #333;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+h2 { text-align: center; margin-bottom: 10px; }
+p, ol { line-height: 1.6; color: #555; }
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  font-size: 1.1em;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+#decompressBtn { background-color: #e67e22; color: white; }
+#decompressBtn:hover { background-color: #d35400; }
+
+#downloadBtn { background-color: #3498db; color: white; }
+#downloadBtn:hover { background-color: #2980b9; }
+
+textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 12px;
+  resize: none;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: monospace;
+  background: #f7f9fb;
+  color: #333;
+}
+</style>
+<script>
+// Fungsi ambil fileId dari URL
+function getFileIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("fileId");
+}
+
+// Tampilkan fileId dan URL Google Drive di halaman
+window.addEventListener('DOMContentLoaded', () => {
+  const fileId = getFileIdFromURL();
+  document.getElementById('fileIdDisplay').textContent = fileId || "-";
+  const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+  document.getElementById('fileUrlDisplay').value = zipURL;
+});
+
+// Log helper
+function writeLog(msg) {
+  const logBox = document.getElementById('logBox');
+  logBox.value += `[INFO] ${msg}\n`;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+// Tombol Download & Dekompresi (dummy untuk percobaan)
+function downloadAndDecompress() {
+  const pwd = document.getElementById('password').value.trim();
+  if (!pwd) {
+    writeLog("Masukkan password ZIP terlebih dahulu!");
+    return;
+  }
+  writeLog("Tombol Download & Dekompresi ditekan (belum diimplementasikan)");
+}
+
+// Tombol Download ZIP mentah
+function downloadZIPDirect() {
+  const url = document.getElementById('fileUrlDisplay').value;
+  if (!url || url === "-") {
+    writeLog("URL file kosong, tidak bisa download.");
+    return;
+  }
+  window.open(url, "_blank");
+  writeLog("Memulai download ZIP langsung...");
+}
+</script>
 </head>
 <body>
-<h2>Test File ID dari URL</h2>
-<p>File ID yang didapat dari URL:</p>
-<p id="fileIdDisplay" style="font-weight: bold; color: blue;"></p>
-  <script>
+<div class="container">
+  <h2>ZIP Downloader</h2>
+  <p>Prosedur penggunaan:</p>
+  <ol>
+    <li>Scan QR Code untuk membuka halaman ini.</li>
+    <li>Masukkan password ZIP pada kotak input.</li>
+    <li>Pilih "Download & Dekompresi" untuk membuka ZIP di browser.</li>
+    <li>Atau pilih "Download ZIP Mentah" untuk langsung download file ZIP.</li>
+    <li>Periksa kotak log untuk status dan pesan error.</li>
+  </ol>
+
+  <p><strong>File ID:</strong> <span id="fileIdDisplay">-</span></p>
+  <p><strong>URL file ZIP Google Drive:</strong></p>
+  <input type="text" id="fileUrlDisplay" readonly>
+
+  <input type="password" id="password" placeholder="Masukkan password ZIP">
+
+  <button id="decompressBtn" onclick="downloadAndDecompress()">Download & Dekompresi</button>
+  <button id="downloadBtn" onclick="downloadZIPDirect()">Download ZIP Mentah</button>
+
+  <p><strong>Log:</strong></p>
+  <textarea id="logBox" readonly></textarea>
+</div>
+<script>
 // Fungsi ambil fileId dari URL
 function getFileIdFromURL() {
   const params = new URLSearchParams(window.location.search);
@@ -21,6 +145,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const display = document.getElementById('fileIdDisplay');
   display.textContent = fileId || "Tidak ada fileId di URL";
 });
-  </script>
+</script>
 </body>
 </html>
