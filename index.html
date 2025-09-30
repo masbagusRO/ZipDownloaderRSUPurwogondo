@@ -89,8 +89,7 @@ textarea {
   <p><strong>Log:</strong></p>
   <textarea id="logBox" readonly></textarea>
 </div>
-
-<script type="module">
+  <script type="module">
 // Import zip.js dari CDN
 import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
 
@@ -122,7 +121,7 @@ function setLoading(isLoading) {
 }
 
 // Fungsi utama: download & dekompresi ZIP
-async function downloadAndDecompress() {
+window.downloadAndDecompress = async function() {
   const fileId = getFileIdFromURL();
   const password = document.getElementById('password').value.trim();
 
@@ -170,7 +169,7 @@ async function downloadAndDecompress() {
 }
 
 // Tombol download ZIP mentah
-function downloadZIPDirect() {
+window.downloadZIPDirect = function() {
   const fileId = getFileIdFromURL();
   if (!fileId) { writeLog("URL kosong atau ID file tidak valid!", "error"); return; }
   const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
@@ -185,6 +184,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
   document.getElementById('fileUrlDisplay').value = zipURL;
 });
-</script>
+  </script>
 </body>
 </html>
