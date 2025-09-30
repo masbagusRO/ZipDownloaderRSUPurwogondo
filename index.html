@@ -132,18 +132,100 @@ function downloadZIPDirect() {
   <p><strong>Log:</strong></p>
   <textarea id="logBox" readonly></textarea>
 </div>
-<script>
-// Fungsi ambil fileId dari URL
+<script type="module">
+// Import zip.js dari CDN
+import * as zip from "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.min.mjs";
+
+// Ambil fileId dari URL
 function getFileIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("fileId");
 }
 
-// Tampilkan fileId di halaman
+// Tulis log ke kotak log
+function writeLog(message, type="info") {
+  const logBox = document.getElementById("logBox");
+  const time = new Date().toLocaleTimeString();
+  const prefix = type === "error" ? "[ERROR]" : type === "success" ? "[OK]" : "[INFO]";
+  logBox.value += `${prefix} ${time} - ${message}\n`;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+// Toggle tombol loading
+function setLoading(isLoading) {
+  const btn = document.getElementById("decompressBtn");
+  if (isLoading) {
+    btn.disabled = true;
+    btn.textContent = "Memproses...";
+  } else {
+    btn.disabled = false;
+    btn.textContent = "Download & Dekompresi";
+  }
+}
+
+// Fungsi utama: download & dekompresi ZIP
+export async function downloadAndDecompress() {
+  const fileId = getFileIdFromURL();
+  const password = document.getElementById('password').value.trim();
+
+  if (!fileId) { writeLog("URL kosong atau ID file tidak valid!", "error"); return; }
+  if (!password) { writeLog("Masukkan password ZIP!", "error"); return; }
+
+  setLoading(true);
+
+  const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
+  writeLog("Memulai download file ZIP dari Google Drive...");
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Gagal download file. Pastikan file publik.");
+    const blob = await response.blob();
+
+    const reader = new zip.ZipReader(new zip.BlobReader(blob), { password });
+    const entries = await reader.getEntries();
+
+    if (entries.length === 0) {
+      writeLog("ZIP kosong atau password salah!", "error");
+      await reader.close();
+      setLoading(false);
+      return;
+    }
+
+    for (const entry of entries) {
+      if (!entry.directory) {
+        const fileData = await entry.getData(new zip.Uint8ArrayWriter());
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([fileData]));
+        a.download = entry.filename;
+        a.click();
+        writeLog(`File "${entry.filename}" berhasil di-download.`, "success");
+      }
+    }
+
+    await reader.close();
+    writeLog("Semua file berhasil di-download!", "success");
+  } catch (err) {
+    writeLog("Error: " + err.message, "error");
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Tombol download ZIP mentah
+export function downloadZIPDirect() {
+  const fileId = getFileIdFromURL();
+  if (!fileId) { writeLog("URL kosong atau ID file tidak valid!", "error"); return; }
+  const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
+  window.open(url, "_blank");
+  writeLog("Memulai download ZIP langsung...");
+}
+
+// Set fileId & URL di halaman saat DOM siap
 window.addEventListener('DOMContentLoaded', () => {
   const fileId = getFileIdFromURL();
-  const display = document.getElementById('fileIdDisplay');
-  display.textContent = fileId || "Tidak ada fileId di URL";
+  document.getElementById('fileIdDisplay').textContent = fileId || "-";
+  const zipURL = fileId ? `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+  document.getElementById('fileUrlDisplay').value = zipURL;
 });
 </script>
 </body>
