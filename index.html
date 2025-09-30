@@ -63,6 +63,40 @@ textarea {
   background: #f7f9fb;
   color: #333;
 }
+#decompressBtn {
+  width: 100%;
+  font-size: 1.4em; /* diperbesar */
+  padding: 16px;    /* diperbesar */
+  background-color: #e67e22;
+  color: white;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#decompressBtn:hover {
+  background-color: #d35400;
+  transform: scale(1.05);
+}
+
+/* Animasi titik-titik */
+.loading-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 3px;
+  background-color: white;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 20%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
 </style>
 <!-- zip.js CDN (UMD version, global variable: zip) -->
 <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
@@ -115,6 +149,17 @@ function setLoading(isLoading) {
   btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
 }
 
+  function setLoading(isLoading) {
+  const btn = document.getElementById("decompressBtn");
+  btn.disabled = isLoading;
+  if (isLoading) {
+    // tampilkan animasi titik-titik
+    btn.innerHTML = 'Memproses<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+  } else {
+    btn.textContent = 'Download & Dekompresi';
+  }
+  }
+  
 // Download & dekompresi ZIP
 function downloadAndDecompress() {
   const fileId = getFileIdFromURL();
