@@ -417,7 +417,7 @@
         writeLog("Mengambil file ZIP dari Google Drive...");
 
         try {
-            const fileId = "1T6CC0KU2EBhkXfewYtGI57415JBkYV_"; // dummy, ganti sesuai
+            const fileId = "1T6CC0KU2EBhkXfewYtGI57415JBkYV_-"; // dummy, ganti sesuai
             const url = `https://script.google.com/macros/s/AKfycbzp0ofbZfgvagXAdr5rjqTTaLcGJqRUyM42WFcJdh19vaC6ce8de64Xwsfoe3V0r2hecQ/exec?fileId=${fileId}`;
 
             const res = await fetch(url);
@@ -482,7 +482,7 @@
 
     // Download ZIP langsung dari Google Drive
     function downloadZIPDirect() {
-        const fileId = '1GiHPU7ndi4VgX1kUatk1RNd0NGpe8aD0'; // contoh dummy
+        const fileId = '1T6CC0KU2EBhkXfewYtGI57415JBkYV_-'; // contoh dummy
         if (!fileId) {
             writeLog("URL kosong atau ID file tidak valid!", "error");
             return;
@@ -494,7 +494,7 @@
 
     // Bind tombol setelah DOM ready
     window.addEventListener('DOMContentLoaded', () => {
-        const fileId = '1GiHPU7ndi4VgX1kUatk1RNd0NGpe8aD0'; // contoh dummy
+        const fileId = '1T6CC0KU2EBhkXfewYtGI57415JBkYV_-'; // contoh dummy
         document.getElementById('fileIdDisplay').textContent = fileId || "-";
         document.getElementById('fileUrlDisplay').value = fileId ?
             `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
