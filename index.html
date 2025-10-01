@@ -332,7 +332,9 @@
     function writeLog(msg, type = "info") {
         const logBox = document.getElementById('logBox');
         const time = new Date().toLocaleTimeString();
-        const prefix = type === "error" ? "[ERROR]" : type === "success" ? "[OK]" : "[INFO]";
+        const prefix =
+            type === "error" ? "[ERROR]" :
+            type === "success" ? "[OK]" : "[INFO]";
         logBox.value += `${prefix} ${time} - ${msg}\n`;
         logBox.scrollTop = logBox.scrollHeight;
     }
@@ -344,17 +346,7 @@
     }
 
     function isiDataPasien(text) {
-        // Escape karakter spesial HTML → aman ditampilkan
-        function escapeHTML(str) {
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-        }
-
-        // Ubah teks jadi baris
         const lines = text.split(/\r?\n/);
-
         let section = null;
         let hasilPemeriksaan = [];
 
@@ -371,20 +363,15 @@
 
                 const value = rest.join(":").trim();
                 const cleanKey = key.trim().replace(/\s+/g, "");
-
                 const el = document.getElementById(cleanKey);
-                if (el) {
-                    el.textContent = value; // aman
-                }
+                if (el) el.textContent = value;
             } else if (section === "hasil") {
                 hasilPemeriksaan.push(line);
             }
         });
 
-        // Gabungkan hasil pemeriksaan
         if (hasilPemeriksaan.length > 0) {
-            let hasilText = hasilPemeriksaan.join("\n")
-                .replace(/\t/g, "    "); // tab → 4 spasi
+            let hasilText = hasilPemeriksaan.join("\n").replace(/\t/g, "    ");
             document.getElementById("HasilPemeriksaan").textContent = hasilText;
         }
     }
@@ -394,9 +381,8 @@
             throw new Error("Base64 tidak valid");
         }
         base64 = base64.replace(/\s/g, "");
-        while (base64.length % 4 !== 0) {
-            base64 += "=";
-        }
+        while (base64.length % 4 !== 0) base64 += "=";
+
         const binary = atob(base64);
         const bytes = new Uint8Array(binary.length);
         for (let i = 0; i < binary.length; i++) {
@@ -418,24 +404,24 @@
 
         try {
             const fileId = "16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH"; // dummy, ganti sesuai
-            const url = `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
+            const url =
+                `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
 
             const res = await fetch(url);
             if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
-            const json = await res.json();
 
+            const json = await res.json();
             if (!json.success || !json.data) {
                 throw new Error(json.message || "Data base64 kosong / tidak valid");
             }
 
-            // decode base64 → Uint8Array
             const arrayBuffer = base64ToUint8Array(json.data);
 
-            // Reset isi lama sebelum menambah yang baru
+            // Reset hasil lama
             document.getElementById("resultImages").innerHTML = "";
             document.getElementById("HasilPemeriksaan").textContent = "";
 
-            // Buka ZIP dengan password
+            // Buka ZIP
             const blob = new Blob([arrayBuffer], { type: "application/zip" });
             const reader = new zip.ZipReader(new zip.BlobReader(blob));
 
@@ -446,34 +432,31 @@
 
             let teksDitemukan = false;
             let gambarDitemukan = false;
+
             for (const entry of entries) {
                 if (entry.filename.endsWith(".txt")) {
                     const text = await entry.getData(new zip.TextWriter(), { password });
                     isiDataPasien(text);
                     teksDitemukan = true;
                 } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
-    const imgBlob = await entry.getData(new zip.BlobWriter(), { password });
-    const url = URL.createObjectURL(imgBlob);
+                    const imgBlob = await entry.getData(new zip.BlobWriter(), { password });
+                    const url = URL.createObjectURL(imgBlob);
 
-    // buat elemen link
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";  // buka di tab baru
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
 
-    // buat elemen gambar
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = entry.filename;
-    img.style.maxWidth = "200px";
-    img.style.margin = "5px";
+                    const img = document.createElement("img");
+                    img.src = url;
+                    img.alt = entry.filename;
+                    img.style.maxWidth = "200px";
+                    img.style.margin = "5px";
 
-    // gabungkan gambar ke dalam link
-    link.appendChild(img);
-
-    // masukkan ke halaman
-    document.getElementById("resultImages").appendChild(link);
-    gambarDitemukan = true;
-}
+                    link.appendChild(img);
+                    document.getElementById("resultImages").appendChild(link);
+                    gambarDitemukan = true;
+                }
             }
 
             if (teksDitemukan || gambarDitemukan) {
