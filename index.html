@@ -451,18 +451,29 @@
                     const text = await entry.getData(new zip.TextWriter(), { password });
                     isiDataPasien(text);
                     teksDitemukan = true;
-                } else if (/\.(jpg|jpeg|png|gif)$/i.test(entry.filename)) {
-                    const imgBlob = await entry.getData(new zip.BlobWriter(), { password });
-                    const url = URL.createObjectURL(imgBlob);
+                } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
+    const imgBlob = await entry.getData(new zip.BlobWriter(), { password });
+    const url = URL.createObjectURL(imgBlob);
 
-                    const img = document.createElement("img");
-                    img.src = url;
-                    img.alt = entry.filename;
-                    img.style.maxWidth = "200px";
-                    img.style.margin = "5px";
-                    document.getElementById("resultImages").appendChild(img);
-                    gambarDitemukan = true;
-                }
+    // buat elemen link
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";  // buka di tab baru
+
+    // buat elemen gambar
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = entry.filename;
+    img.style.maxWidth = "200px";
+    img.style.margin = "5px";
+
+    // gabungkan gambar ke dalam link
+    link.appendChild(img);
+
+    // masukkan ke halaman
+    document.getElementById("resultImages").appendChild(link);
+    gambarDitemukan = true;
+}
             }
 
             if (teksDitemukan || gambarDitemukan) {
