@@ -425,6 +425,11 @@
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
                 const json = await res.json();
+                if (!json.success || !json.data) {
+    throw new Error(json.message || "Data base64 kosong / tidak valid");
+}
+
+const arrayBuffer = base64ToUint8Array(json.data);
 
                // decode base64 → Uint8Array
 const arrayBuffer = base64ToUint8Array(json.data);
