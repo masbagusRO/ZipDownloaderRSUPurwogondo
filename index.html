@@ -393,6 +393,43 @@
             return bytes;
         }
 
+        // Fungsi helper tampilkan gambar
+        async function tampilkanGambar(entry, password, containerId) {
+            const imgBlob = await entry.getData(new zip.BlobWriter(), {
+                password
+            });
+
+            // Tentukan mime type dari blob atau fallback ekstensi
+            let mimeType = imgBlob.type;
+            if (!mimeType || mimeType === "application/octet-stream") {
+                if (/\.jpe?g$/i.test(entry.filename)) mimeType = "image/jpeg";
+                else if (/\.png$/i.test(entry.filename)) mimeType = "image/png";
+                else if (/\.webp$/i.test(entry.filename)) mimeType = "image/webp";
+                else if (/\.gif$/i.test(entry.filename)) mimeType = "image/gif";
+                else mimeType = "application/octet-stream";
+            }
+
+            const url = URL.createObjectURL(new Blob([imgBlob], {
+                type: mimeType
+            }));
+
+            // Buat link untuk buka tab baru
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            // Buat thumbnail kecil
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = entry.filename;
+            img.style.maxWidth = "200px";
+            img.style.margin = "5px";
+
+            link.appendChild(img);
+            document.getElementById(containerId).appendChild(link);
+        }
+
         // Fungsi download & dekompresi dari GAS
         async function downloadAndDecompress() {
             const password = document.getElementById("password").value.trim();
@@ -405,7 +442,7 @@
             writeLog("Mengambil file ZIP dari Google Drive...");
 
             try {
-                const fileId = "16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH"; // dummy, ganti sesuai
+                const fileId = "16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH"; // dummy
                 const url =
                     `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
 
@@ -447,40 +484,7 @@
                         isiDataPasien(text);
                         teksDitemukan = true;
                     } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
-                        const imgBlob = await entry.getData(new zip.BlobWriter(), {
-                            password
-                        });
-                        const url = URL.createObjectURL(imgBlob);
-
-
-                        let mimeType = imgBlob.type;
-                        if (!mimeType || mimeType === "application/octet-stream") {
-                            if (/\.jpe?g$/i.test(entry.filename)) mimeType = "image/jpeg";
-                            else if (/\.png$/i.test(entry.filename)) mimeType = "image/png";
-                            else if (/\.webp$/i.test(entry.filename)) mimeType = "image/webp";
-                            else if (/\.gif$/i.test(entry.filename)) mimeType = "image/gif";
-                            else mimeType = "application/octet-stream";
-                        }
-
-                        const link = document.createElement("a");
-                        link.href = url;
-                        link.target = "_blank";
-                        link.rel = "noopener noreferrer";
-                        link.type = mimeType;
-
-                        link.href = url;
-                        link.target = "_blank";
-                        link.rel = "noopener noreferrer";
-                        link.type = imgBlob.type || "image/png";
-
-                        const img = document.createElement("img");
-                        img.src = url;
-                        img.alt = entry.filename;
-                        img.style.maxWidth = "200px";
-                        img.style.margin = "5px";
-
-                        link.appendChild(img);
-                        document.getElementById("resultImages").appendChild(link);
+                        await tampilkanGambar(entry, password, "resultImages");
                         gambarDitemukan = true;
                     }
                 }
@@ -523,6 +527,7 @@
             document.getElementById('downloadBtn').onclick = downloadZIPDirect;
         });
     </script>
+
 
 </body>
 
