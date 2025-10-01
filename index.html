@@ -426,27 +426,18 @@
                 if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
                 const json = await res.json();
 
-                // decode base64 → Uint8Array
-                const binary = atob(json.data);
-                const arrayBuffer = base64ToUint8Array(json.data);
-
-                //const arrayBuffer = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    arrayBuffer[i] = binary.charCodeAt(i);
-                }
+               // decode base64 → Uint8Array
+const arrayBuffer = base64ToUint8Array(json.data);
 
                 // Buka ZIP dengan password
-                const blob = new Blob([arrayBuffer], {
-                    type: "application/zip"
-                });
-                const reader = new zip.ZipReader(new zip.BlobReader(blob));
+const blob = new Blob([arrayBuffer], { type: "application/zip" });
+const reader = new zip.ZipReader(new zip.BlobReader(blob));
+                
 
-                const entries = await reader.getEntries({
-                    password
-                });
-                if (entries.length === 0) {
-                    throw new Error("ZIP kosong atau password salah");
-                }
+               const entries = await reader.getEntries({ password });
+if (entries.length === 0) {
+    throw new Error("ZIP kosong atau password salah");
+}
 
                 let teksDitemukan = false;
                 let gambarDitemukan = false;
