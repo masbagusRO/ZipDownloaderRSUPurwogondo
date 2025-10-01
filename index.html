@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <title>ZIP Downloader</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f4f8;
@@ -94,7 +98,97 @@
         }
 
         #result {
-            display: none;
+            /* display: none; */
+            font-size: 10px;
+            border: 1px dashed black;
+        }
+
+        /* --- Kop surat --- */
+        .kop-surat {
+            /* background-color: #3498db; */
+            display: grid;
+            grid-template-columns: 100px auto;
+            gap: 5px;
+            border-bottom: 2px solid black;
+            /* margin-bottom: 10px; */
+        }
+
+        .kop-surat .logo img {
+            width: 90px;
+        }
+
+        .kop-surat .instansi {
+            /* grid-column: 2; */
+            text-align: right;
+            line-height: 0.01;
+        }
+
+        .kop-surat .instansi h1 {
+            font-size: 14pt;
+            /* margin-bottom: 10px; */
+        }
+
+        /* identitas pasien */
+        /* --- Tabel identitas pasien --- */
+        #IdentitasPasien {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        #IdentitasPasien col:nth-child(1) {
+            width: 80px;
+        }
+
+        #IdentitasPasien col:nth-child(2) {
+            width: 10px;
+        }
+
+        #IdentitasPasien col:nth-child(3) {
+            width: 170px;
+        }
+
+        #IdentitasPasien col:nth-child(4) {
+            width: 120px;
+        }
+
+        #IdentitasPasien col:nth-child(5) {
+            width: 10px;
+        }
+
+        #IdentitasPasien col:nth-child(6) {
+            width: 170px;
+        }
+
+        #IdentitasPasien td {
+            padding: 4px;
+            vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        #IdentitasPasien td:nth-child(2),
+        #IdentitasPasien td:nth-child(5) {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #HasilPemeriksaan {
+            border: 1px solid black;
+            padding: 5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            margin: 10px 0;
+            margin: 0 5px;
+        }
+
+        /* --- Tabel petugas --- */
+        #KolomPetugas {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-top: 15px;
         }
     </style>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> -->
@@ -125,9 +219,104 @@
         <textarea id="logBox" readonly></textarea>
 
         <div id="result" style="margin-top:20px;">
-            <h3>Belum ada text</h3>
-            <pre id="resultText"></pre>
-            <h3>Hasil Foto</h3>
+            <div class="kop-surat">
+                <!-- <div class="logo">{{{logoHtml}}}</div> -->
+                <div class="logo"><img src="../foto/logo.png" alt="RSU PWG"></div>
+                <div class="instansi">
+                    <h1>RSU PURWOGONDO</h1>
+                    <p>Jl. Puring km.8 Kalipurwo, Kuwarasan, Kebumen, Jawa Tengah</p>
+                    <p>(0287) 472588 / 4760192</p>
+                    <p>Email: rsu.purwogondo@yahoo.co.id</p>
+                </div>
+            </div>
+            <p style="text-align: center; margin-bottom: 5pt; font-weight: bold;">Hasil Pemeriksaan Radiologi</p>
+            <table id="IdentitasPasien">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>No. RM</td>
+                        <td>:</td>
+                        <td id="NoRM">{{NoRM}}</td>
+                        <td>Penanggung Jawab</td>
+                        <td>:</td>
+                        <td id="DokterRadiologi">{{DokterRadiologi}}</td>
+                    </tr>
+                    <tr>
+                        <td>Nama</td>
+                        <td>:</td>
+                        <td id="Nama">{{Nama}}</td>
+                        <td>Dokter Pengirim</td>
+                        <td>:</td>
+                        <td id="DokterPengirim">{{DokterPengirim}}</td>
+                    </tr>
+                    <tr>
+                        <td>JK/Umur</td>
+                        <td>:</td>
+                        <td><span id="JK">{{JK}}</span> / <span id="Umur">{{Umur}}</span></td>
+                        <td>Tgl.Pemeriksaan</td>
+                        <td>:</td>
+                        <td id="TglPemeriksaan">{{TglPemeriksaan}}</td>
+                    </tr>
+                    <tr>
+                        <td>Alamat</td>
+                        <td>:</td>
+                        <td id="Alamat">{{Alamat}}</td>
+                        <td>Jam Pemeriksaan</td>
+                        <td>:</td>
+                        <td id="JamPemeriksaan">{{JamPemeriksaan}}</td>
+                    </tr>
+                    <tr>
+                        <td>No. Periksa</td>
+                        <td>:</td>
+                        <td id="NoPeriksa">{{NoPeriksa}}</td>
+                        <td>Poli/Kamar</td>
+                        <td>:</td>
+                        <td id="Ruangan">{{Ruangan}}</td>
+                    </tr>
+                    <tr>
+                        <td>Pemeriksaan</td>
+                        <td>:</td>
+                        <td colspan="4" id="Pemeriksaan">{{Pemeriksaan}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 10px;">Hasil Pemeriksaan :</p>
+            <div>
+                <pre id="HasilPemeriksaan">{{HasilPemeriksaan}}</pre>
+            </div>
+            <table id="KolomPetugas">
+                <colgroup>
+                    <col>
+                    <col>
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <!-- <td style="text-align: left;">Tgl. Cetak {{tglCetak}}</td> -->
+                        <td>Tgl. Upload {{tglCetak}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Penanggung Jawab</td>
+                        <td>Petugas Radiologi</td>
+                    </tr>
+                    <tr>
+                        <td id="DokterRadiologi">{{DokterRadiologi}}</td>
+                        <td id="PetugasRadiologi">{{PetugasRadiologi}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding-top: 10px;"><strong>!!! <br> Web ini
+                                Digunakan untuk membantu melihat hasil radiologi. Untuk hasil yang resmi, mintalah ke
+                                petugas radiologi RSU Purwogondo <br>!!!</strong></td>
+                    </tr>
+                </tbody>
+            </table>
             <div id="resultImages"></div>
         </div>
     </div>
@@ -153,6 +342,52 @@
             btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
         }
 
+        function isiDataPasien(text) {
+            // Escape karakter spesial HTML → aman ditampilkan
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            // Ubah teks jadi baris
+            const lines = text.split(/\r?\n/);
+
+            let section = null;
+            let hasilPemeriksaan = [];
+
+            lines.forEach(line => {
+                if (line.startsWith("===")) {
+                    if (line.includes("Identitas")) section = "identitas";
+                    else if (line.includes("HasilPemeriksaan")) section = "hasil";
+                    return;
+                }
+
+                if (section === "identitas") {
+                    const [key, ...rest] = line.split(":");
+                    if (!key || !rest.length) return;
+
+                    const value = rest.join(":").trim();
+                    const cleanKey = key.trim().replace(/\s+/g, "");
+
+                    const el = document.getElementById(cleanKey);
+                    if (el) {
+                        el.textContent = value; // aman, tab/spesial ditangani
+                    }
+                } else if (section === "hasil") {
+                    hasilPemeriksaan.push(line);
+                }
+            });
+
+            // Gabungkan hasil pemeriksaan
+            if (hasilPemeriksaan.length > 0) {
+                // Escape HTML, jaga tab (\t) dan spasi
+                let hasilText = hasilPemeriksaan.join("\n")
+                    .replace(/\t/g, "    "); // tab → 4 spasi
+                document.getElementById("HasilPemeriksaan").textContent = hasilText;
+            }
+        }
         // Fungsi download & dekompresi dari GAS
         async function downloadAndDecompress() {
 
@@ -167,7 +402,7 @@
 
 
             try {
-                const fileId = "1GiHPU7ndi4VgX1kUatk1RNd0NGpe8aD0"; // dummy, ganti dari URL
+                const fileId = "1T6CC0KU2EBhkXfewYtGI57415JBkYV_"; // dummy, ganti dari URL
                 const url = `https://script.google.com/macros/s/AKfycbzp0ofbZfgvagXAdr5rjqTTaLcGJqRUyM42WFcJdh19vaC6ce8de64Xwsfoe3V0r2hecQ/exec?fileId=${fileId}`;
 
                 const res = await fetch(url);
@@ -201,14 +436,15 @@
                         const text = await entry.getData(new zip.TextWriter(), {
                             password
                         });
-                        document.getElementById("resultText").textContent = text;
+                        isiDataPasien(text);
+                        // document.getElementById("resultText").textContent = text;
                         teksDitemukan = true;
                     } else if (/\.(jpg|jpeg|png|gif)$/i.test(entry.filename)) {
                         const imgBlob = await entry.getData(new zip.BlobWriter(), {
                             password
                         });
                         const url = URL.createObjectURL(imgBlob);
-                        
+
                         const img = document.createElement("img");
                         img.src = url;
                         img.alt = entry.filename;
