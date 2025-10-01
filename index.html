@@ -446,6 +446,7 @@
                     link.href = url;
                     link.target = "_blank";
                     link.rel = "noopener noreferrer";
+                    link.type = imgBlob.type || "image/png";
 
                     const img = document.createElement("img");
                     img.src = url;
