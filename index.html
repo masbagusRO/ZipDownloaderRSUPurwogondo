@@ -324,103 +324,129 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
-    <script>
-        // Ambil fileId dari URL (opsional)
-        function getFileIdFromURL() {
+<script>
+    // ================================
+    // Ambil fileId dari URL
+    // ================================
+    function getFileIdFromURL() {
+        try {
             const params = new URLSearchParams(window.location.search);
-            return params.get("fileId");
-        }
+            const fileId = params.get("fileId");
 
-        function writeLog(msg, type = "info") {
-            const logBox = document.getElementById('logBox');
-            const time = new Date().toLocaleTimeString();
-            const prefix =
-                type === "error" ? "[ERROR]" :
-                type === "success" ? "[OK]" : "[INFO]";
-            logBox.value += `${prefix} ${time} - ${msg}\n`;
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        function setLoading(isLoading) {
-            const btn = document.getElementById("decompressBtn");
-            btn.disabled = isLoading;
-            btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
-        }
-
-        function isiDataPasien(text) {
-            const lines = text.split(/\r?\n/);
-            let section = null;
-            let hasilPemeriksaan = [];
-
-            lines.forEach(line => {
-                if (line.startsWith("===")) {
-                    if (line.includes("Identitas")) section = "identitas";
-                    else if (line.includes("HasilPemeriksaan")) section = "hasil";
-                    return;
-                }
-
-                if (section === "identitas") {
-                    const [key, ...rest] = line.split(":");
-                    if (!key || !rest.length) return;
-
-                    const value = rest.join(":").trim();
-                    const cleanKey = key.trim().replace(/\s+/g, "");
-                    const el = document.getElementById(cleanKey);
-                    if (el) el.textContent = value;
-                } else if (section === "hasil") {
-                    hasilPemeriksaan.push(line);
-                }
-            });
-
-            if (hasilPemeriksaan.length > 0) {
-                let hasilText = hasilPemeriksaan.join("\n").replace(/\t/g, "    ");
-                document.getElementById("HasilPemeriksaan").textContent = hasilText;
+            if (!fileId) {
+                throw new Error("fileId tidak ditemukan di URL.");
             }
+
+            return fileId;
+        } catch (err) {
+            console.error("Gagal mengambil fileId:", err.message);
+            return null;
         }
+    }
 
-        function base64ToUint8Array(base64) {
-            if (!base64 || typeof base64 !== "string") {
-                throw new Error("Base64 tidak valid");
+    let fileId;
+
+    // ================================
+    // Logging helper
+    // ================================
+    function writeLog(msg, type = "info") {
+        const logBox = document.getElementById('logBox');
+        const time = new Date().toLocaleTimeString();
+        const prefix =
+            type === "error" ? "[ERROR]" :
+            type === "success" ? "[OK]" : "[INFO]";
+        logBox.value += `${prefix} ${time} - ${msg}\n`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // ================================
+    // Loading state
+    // ================================
+    function setLoading(isLoading) {
+        const btn = document.getElementById("decompressBtn");
+        btn.disabled = isLoading;
+        btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
+    }
+
+    // ================================
+    // Isi data pasien dari TXT
+    // ================================
+    function isiDataPasien(text) {
+        const lines = text.split(/\r?\n/);
+        let section = null;
+        let hasilPemeriksaan = [];
+
+        lines.forEach(line => {
+            if (line.startsWith("===")) {
+                if (line.includes("Identitas")) section = "identitas";
+                else if (line.includes("HasilPemeriksaan")) section = "hasil";
+                return;
             }
-            base64 = base64.replace(/\s/g, "");
-            while (base64.length % 4 !== 0) base64 += "=";
 
+            if (section === "identitas") {
+                const [key, ...rest] = line.split(":");
+                if (!key || !rest.length) return;
+
+                const value = rest.join(":").trim();
+                const cleanKey = key.trim().replace(/\s+/g, "");
+                const el = document.getElementById(cleanKey);
+                if (el) el.textContent = value;
+            } else if (section === "hasil") {
+                hasilPemeriksaan.push(line);
+            }
+        });
+
+        if (hasilPemeriksaan.length > 0) {
+            let hasilText = hasilPemeriksaan.join("\n").replace(/\t/g, "    ");
+            document.getElementById("HasilPemeriksaan").textContent = hasilText;
+        }
+    }
+
+    // ================================
+    // Base64 → Uint8Array
+    // ================================
+    function base64ToUint8Array(base64) {
+        if (!base64 || typeof base64 !== "string") {
+            throw new Error("Base64 tidak valid atau kosong");
+        }
+        base64 = base64.replace(/\s/g, "");
+        while (base64.length % 4 !== 0) base64 += "=";
+
+        try {
             const binary = atob(base64);
             const bytes = new Uint8Array(binary.length);
             for (let i = 0; i < binary.length; i++) {
                 bytes[i] = binary.charCodeAt(i);
             }
             return bytes;
+        } catch (err) {
+            throw new Error("Gagal decode base64: " + err.message);
         }
+    }
 
-        // Fungsi helper tampilkan gambar
-        async function tampilkanGambar(entry, password, containerId) {
-            const imgBlob = await entry.getData(new zip.BlobWriter(), {
-                password
-            });
+    // ================================
+    // Tampilkan gambar dari ZIP
+    // ================================
+    async function tampilkanGambar(entry, password, containerId) {
+        try {
+            const imgBlob = await entry.getData(new zip.BlobWriter(), { password });
+            if (!imgBlob) throw new Error("Blob kosong");
 
-            // Tentukan mime type dari blob atau fallback ekstensi
             let mimeType = imgBlob.type;
             if (!mimeType || mimeType === "application/octet-stream") {
                 if (/\.jpe?g$/i.test(entry.filename)) mimeType = "image/jpeg";
                 else if (/\.png$/i.test(entry.filename)) mimeType = "image/png";
                 else if (/\.webp$/i.test(entry.filename)) mimeType = "image/webp";
                 else if (/\.gif$/i.test(entry.filename)) mimeType = "image/gif";
-                else mimeType = "application/octet-stream";
             }
 
-            const url = URL.createObjectURL(new Blob([imgBlob], {
-                type: mimeType
-            }));
+            const url = URL.createObjectURL(new Blob([imgBlob], { type: mimeType }));
 
-            // Buat link untuk buka tab baru
             const link = document.createElement("a");
             link.href = url;
             link.target = "_blank";
             link.rel = "noopener noreferrer";
 
-            // Buat thumbnail kecil
             const img = document.createElement("img");
             img.src = url;
             img.alt = entry.filename;
@@ -429,105 +455,111 @@
 
             link.appendChild(img);
             document.getElementById(containerId).appendChild(link);
+        } catch (err) {
+            writeLog(`Gagal menampilkan gambar ${entry.filename}: ${err.message}`, "error");
+        }
+    }
+
+    // ================================
+    // Download & dekompresi
+    // ================================
+    async function downloadAndDecompress() {
+        const password = document.getElementById("password").value.trim();
+        if (!password) {
+            writeLog("Password harus diisi!", "error");
+            return;
         }
 
-        // Fungsi download & dekompresi dari GAS
-        async function downloadAndDecompress() {
-            const password = document.getElementById("password").value.trim();
-            if (!password) {
-                writeLog("Password harus diisi!", "error");
-                return;
-            }
-
-            setLoading(true);
-            writeLog("Mengambil file ZIP dari Google Drive...");
-
-            try {
-                const fileId = "16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH"; // dummy
-                const url =
-                    `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
-
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
-
-                const json = await res.json();
-                if (!json.success || !json.data) {
-                    throw new Error(json.message || "Data base64 kosong / tidak valid");
-                }
-
-                const arrayBuffer = base64ToUint8Array(json.data);
-
-                // Reset hasil lama
-                document.getElementById("resultImages").innerHTML = "";
-                document.getElementById("HasilPemeriksaan").textContent = "";
-
-                // Buka ZIP
-                const blob = new Blob([arrayBuffer], {
-                    type: "application/zip"
-                });
-                const reader = new zip.ZipReader(new zip.BlobReader(blob));
-
-                const entries = await reader.getEntries({
-                    password
-                });
-                if (entries.length === 0) {
-                    throw new Error("ZIP kosong atau password salah");
-                }
-
-                let teksDitemukan = false;
-                let gambarDitemukan = false;
-
-                for (const entry of entries) {
-                    if (entry.filename.endsWith(".txt")) {
-                        const text = await entry.getData(new zip.TextWriter(), {
-                            password
-                        });
-                        isiDataPasien(text);
-                        teksDitemukan = true;
-                    } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
-                        await tampilkanGambar(entry, password, "resultImages");
-                        gambarDitemukan = true;
-                    }
-                }
-
-                if (teksDitemukan || gambarDitemukan) {
-                    document.getElementById("result").style.display = "block";
-                    writeLog("Dekompresi berhasil!", "success");
-                } else {
-                    writeLog("Tidak ada file teks atau gambar ditemukan!", "error");
-                }
-
-                await reader.close();
-            } catch (err) {
-                writeLog(err.message, "error");
-            } finally {
-                setLoading(false);
-            }
+        if (!fileId) {
+            writeLog("FileId kosong! Pastikan URL memiliki ?fileId=xxx", "error");
+            return;
         }
 
-        // Download ZIP langsung dari Google Drive
-        function downloadZIPDirect() {
-            const fileId = '16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH'; // contoh dummy
-            if (!fileId) {
-                writeLog("URL kosong atau ID file tidak valid!", "error");
-                return;
+        setLoading(true);
+        writeLog("Mengambil file ZIP dari Google Drive...");
+
+        try {
+            const url = `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
+
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
+
+            const json = await res.json();
+            if (!json.success || !json.data) {
+                throw new Error(json.message || "Data base64 kosong / tidak valid");
             }
-            const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
-            window.open(url, "_blank");
-            writeLog("Memulai download ZIP langsung...");
+
+            const arrayBuffer = base64ToUint8Array(json.data);
+
+            // Reset hasil lama
+            document.getElementById("resultImages").innerHTML = "";
+            document.getElementById("HasilPemeriksaan").textContent = "";
+
+            // Buka ZIP
+            const blob = new Blob([arrayBuffer], { type: "application/zip" });
+            const reader = new zip.ZipReader(new zip.BlobReader(blob));
+
+            const entries = await reader.getEntries({ password });
+            if (entries.length === 0) {
+                throw new Error("ZIP kosong atau password salah");
+            }
+
+            let teksDitemukan = false;
+            let gambarDitemukan = false;
+
+            for (const entry of entries) {
+                if (entry.filename.endsWith(".txt")) {
+                    const text = await entry.getData(new zip.TextWriter(), { password });
+                    isiDataPasien(text);
+                    teksDitemukan = true;
+                } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
+                    await tampilkanGambar(entry, password, "resultImages");
+                    gambarDitemukan = true;
+                }
+            }
+
+            if (teksDitemukan || gambarDitemukan) {
+                document.getElementById("result").style.display = "block";
+                writeLog("Dekompresi berhasil!", "success");
+            } else {
+                writeLog("Tidak ada file teks atau gambar ditemukan!", "error");
+            }
+
+            await reader.close();
+        } catch (err) {
+            writeLog(err.message, "error");
+        } finally {
+            setLoading(false);
         }
+    }
 
-        // Bind tombol setelah DOM ready
-        window.addEventListener('DOMContentLoaded', () => {
-            const fileId = '16NXx4vnuSLYhDYuyI6U84Z-5YZE1HZsH'; // contoh dummy
-            document.getElementById('fileIdDisplay').textContent = fileId || "-";
-            document.getElementById('fileUrlDisplay').value = fileId ?
-                `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+    // ================================
+    // Download langsung ZIP dari Drive
+    // ================================
+    function downloadZIPDirect() {
+        if (!fileId) {
+            writeLog("URL kosong atau ID file tidak valid!", "error");
+            return;
+        }
+        const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
+        window.open(url, "_blank");
+        writeLog("Memulai download ZIP langsung...");
+    }
 
-            document.getElementById('decompressBtn').onclick = downloadAndDecompress;
-            document.getElementById('downloadBtn').onclick = downloadZIPDirect;
-        });
-    </script>
+    // ================================
+    // Init saat DOM ready
+    // ================================
+    window.addEventListener('DOMContentLoaded', () => {
+        fileId = getFileIdFromURL();
+        document.getElementById('fileIdDisplay').textContent = fileId || "-";
+        document.getElementById('fileUrlDisplay').value = fileId ?
+            `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
+
+        document.getElementById('decompressBtn').onclick = downloadAndDecompress;
+        document.getElementById('downloadBtn').onclick = downloadZIPDirect;
+    });
+</script>
+
 
 
 </body>
