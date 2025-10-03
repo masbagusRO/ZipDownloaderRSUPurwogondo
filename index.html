@@ -551,14 +551,28 @@
         writeLog("Memulai download ZIP langsung...");
     }
 
+    // Cek fitur utama yang dibutuhkan
+    function checkBrowserSupport() {
+        const isFetchSupported = typeof window.fetch === "function";
+        const isBlobSupported = typeof window.Blob === "function";
+        const isZipSupported = typeof window.zip !== "undefined" && typeof window.zip.ZipReader === "function";
+
+        if (!isFetchSupported || !isBlobSupported || !isZipSupported) {
+            alert("Browser ini tidak kompatibel. Disarankan menggunakan Chrome atau Firefox.");
+        }
+    }
+
+    // Jalankan saat DOM siap
+    document.addEventListener('DOMContentLoaded', () => {
+        checkBrowserSupport();
+    });
+    
     // ================================
     // Init saat DOM ready
     // ================================
     window.addEventListener('DOMContentLoaded', () => {
         //sering tidak support kalau bukan chrome/firefox
-    if (!/Chrome|Firefox/.test(navigator.userAgent)) {
-    alert("Disarankan menggunakan Chrome atau Firefox untuk menampilkan gambar.");
-}
+    checkBrowserSupport();
         fileId = getFileIdFromURL();
         document.getElementById('fileIdDisplay').textContent = fileId || "-";
         document.getElementById('fileUrlDisplay').value = fileId ?
