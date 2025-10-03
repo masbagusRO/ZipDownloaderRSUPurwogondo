@@ -195,12 +195,6 @@
 </head>
 
 <body>
-    <script>
-        //sering tidak support kalau bukan chrome/firefox
-    if (!/Chrome|Firefox/.test(navigator.userAgent)) {
-    alert("Disarankan menggunakan Chrome atau Firefox untuk menampilkan gambar.");
-}
-    </script>
     <div class="container">
         <h2>Radiologi RSU purwogondo</h2>
         <p>Prosedur penggunaan:</p>
@@ -561,6 +555,10 @@
     // Init saat DOM ready
     // ================================
     window.addEventListener('DOMContentLoaded', () => {
+        //sering tidak support kalau bukan chrome/firefox
+    if (!/Chrome|Firefox/.test(navigator.userAgent)) {
+    alert("Disarankan menggunakan Chrome atau Firefox untuk menampilkan gambar.");
+}
         fileId = getFileIdFromURL();
         document.getElementById('fileIdDisplay').textContent = fileId || "-";
         document.getElementById('fileUrlDisplay').value = fileId ?
