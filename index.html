@@ -196,24 +196,26 @@
 
 <body>
     <div class="container">
-        <h2>ZIP Downloader</h2>
+        <h2>Radiologi RSU purwogondo</h2>
         <p>Prosedur penggunaan:</p>
         <ol>
-            <li>Scan QR Code untuk membuka halaman ini.</li>
-            <li>Masukkan password ZIP pada kotak input (jika ada).</li>
-            <li>Pilih "Download & Dekompresi" untuk membuka ZIP di browser.</li>
-            <li>Atau pilih "Download ZIP Mentah" untuk langsung download file ZIP.</li>
+            <li>Hanya dapat digunakan oleh pasien RSU purwogondo</li>
+            <li>Masukkan password pada kotak input</li>
+            <li>Pilih "Proses" untuk melihat hasil roentgen di browser.</li>
+            <li>Atau pilih "Download ZIP" untuk langsung download file roentgen.</li>
             <li>Periksa kotak log untuk status dan pesan error.</li>
+            <li>disarankan menekan tombol "download zip" jika terjadi error pada tombol "lihat"</li>
+            <li>password ada di kertas yang diberikan oleh petugas radiologi</li>
         </ol>
 
         <p><strong>File ID:</strong> <span id="fileIdDisplay">-</span></p>
         <p><strong>URL file ZIP Google Drive:</strong></p>
         <input type="text" id="fileUrlDisplay" readonly>
 
-        <input type="text" id="password" placeholder="Masukkan password ZIP">
+        <input type="text" id="password" placeholder="Masukkan password">
 
-        <button id="decompressBtn">Download & Dekompresi</button>
-        <button id="downloadBtn">Download ZIP Mentah</button>
+        <button id="decompressBtn">Proses</button>
+        <button id="downloadBtn">Download ZIP</button>
 
         <p><strong>Log:</strong></p>
         <textarea id="logBox" readonly></textarea>
