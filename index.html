@@ -433,11 +433,12 @@
             if (!imgBlob) throw new Error("Blob kosong");
 
             let mimeType = imgBlob.type;
+            const filename =entry.filename.trim();
             if (!mimeType || mimeType === "application/octet-stream") {
-                if (/\.jpe?g$/i.test(entry.filename)) mimeType = "image/jpeg";
-                else if (/\.png$/i.test(entry.filename)) mimeType = "image/png";
-                else if (/\.webp$/i.test(entry.filename)) mimeType = "image/webp";
-                else if (/\.gif$/i.test(entry.filename)) mimeType = "image/gif";
+                if (/\.jpe?g$/i.test(filename)) mimeType = "image/jpeg";
+                else if (/\.png$/i.test(filename)) mimeType = "image/png";
+                else if (/\.webp$/i.test(filename)) mimeType = "image/webp";
+                else if (/\.gif$/i.test(filename)) mimeType = "image/gif";
             }
 
             const url = URL.createObjectURL(new Blob([imgBlob], { type: mimeType }));
