@@ -195,6 +195,12 @@
 </head>
 
 <body>
+    <script>
+        //sering tidak support kalau bukan chrome/firefox
+    if (!/Chrome|Firefox/.test(navigator.userAgent)) {
+    alert("Disarankan menggunakan Chrome atau Firefox untuk menampilkan gambar.");
+}
+    </script>
     <div class="container">
         <h2>Radiologi RSU purwogondo</h2>
         <p>Prosedur penggunaan:</p>
@@ -328,10 +334,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
 <script>
 
-    //sering tidak support kalau bukan chrome/firefox
-    if (!/Chrome|Firefox/.test(navigator.userAgent)) {
-    alert("Disarankan menggunakan Chrome atau Firefox untuk menampilkan gambar.");
-}
+    
     // ================================
     // Ambil fileId dari URL
     // ================================
