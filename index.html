@@ -533,7 +533,7 @@
             try {
                 //const url = `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
                 const fileId = getFileIdFromURL();
-                const res = await fetchZipWithFailover(fileId);
+                const json  = await fetchZipWithFailover(fileId);
                 // if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
 
                 // const json = await res.json();
