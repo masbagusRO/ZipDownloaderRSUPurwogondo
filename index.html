@@ -321,13 +321,15 @@
                     </tr>
                 </tbody>
             </table>
-            <p><b>klik gambar untuk melihat gambar di tab baru</b></p>
+            <p><b>klik gambar untuk melihat gambar di tab baru atau tekan "Simpan gambar dan data pasien" untuk menyimpan gambar dan text. gambar tersimpan dalam format ".jpeg" dan data pasien tersimpan dalam format ".txt"</b></p>
             <div id="resultImages"></div>
+            <button id="saveAllBtn" style="background-color:#2ecc71; color:white;">Simpan gambar dan data pasien</button>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
     <script>
-        let fileId;
+        let fileId, entries;
+        const resultImages = document.getElementById("resultImages");
         // ================================
         // Ambil fileId dari URL
         // ================================
@@ -366,7 +368,8 @@
         function setLoading(isLoading) {
             const btn = document.getElementById("decompressBtn");
             btn.disabled = isLoading;
-            btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
+            btn.textContent = isLoading ? "Memproses..." : "Lihat tanpa unduh";
+            // btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
         }
 
         // ================================
@@ -497,6 +500,24 @@
             ];
 
 
+            async function fetchWithTimeout(url, timeout = 10000) { // 10 detik
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+
+                try {
+                    const res = await fetch(url, {
+                        signal: controller.signal
+                    });
+                    clearTimeout(id);
+                    return res;
+                } catch (err) {
+                    clearTimeout(id);
+                    writeLog("Permintaan ke server gagal: koneksi lambat atau file terlalu besar.", "error");
+                    throw err;
+                }
+            }
+
+
             async function fetchZipWithFailover(fileId) {
                 let lastError = null;
 
@@ -506,7 +527,9 @@
                     } of gasUrls) {
                     const fullUrl = `${url}?fileId=${encodeURIComponent(fileId)}`;
                     try {
-                        const res = await fetch(fullUrl);
+                        // const res = await fetch(fullUrl);
+                        const res = await fetchWithTimeout(fullUrl, 180000);
+
                         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
 
                         const json = await res.json();
@@ -532,7 +555,7 @@
             try {
                 //const url = `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
                 //const fileId = getFileIdFromURL();
-                const json  = await fetchZipWithFailover(fileId);
+                const json = await fetchZipWithFailover(fileId);
                 // if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
 
                 // const json = await res.json();
@@ -543,7 +566,7 @@
                 const arrayBuffer = base64ToUint8Array(json.data);
 
                 // Reset hasil lama
-                document.getElementById("resultImages").innerHTML = "";
+                resultImages.innerHTML = "";
                 document.getElementById("HasilPemeriksaan").textContent = "";
 
                 // Buka ZIP
@@ -552,7 +575,7 @@
                 });
                 const reader = new zip.ZipReader(new zip.BlobReader(blob));
 
-                const entries = await reader.getEntries({
+                entries = await reader.getEntries({
                     password
                 });
                 if (entries.length === 0) {
@@ -590,6 +613,8 @@
             }
         }
 
+
+
         // ================================
         // Download langsung ZIP dari Drive
         // ================================
@@ -604,6 +629,50 @@
         }
 
 
+        async function simpanSemuaFile(entries, password) {
+            const hasil = {};
+            for (const entry of entries) {
+                if (entry.directory) continue;
+                if (/\.(txt|csv|json)$/i.test(entry.filename)) {
+                    hasil[entry.filename] = await entry.getData(new zip.TextWriter(), {
+                        password
+                    });
+                } else if (/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(entry.filename)) {
+                    hasil[entry.filename] = await entry.getData(new zip.BlobWriter(), {
+                        password
+                    });
+                } else {
+                    hasil[entry.filename] = await entry.getData(new zip.Uint8ArrayWriter(), {
+                        password
+                    });
+                }
+            }
+            return hasil;
+        }
+
+        const tombolSimpan = document.getElementById("saveAllBtn");
+        tombolSimpan.addEventListener("click", async () => {
+            writeLog("Mencoba menyimpan semua file...");
+            try {
+                if (!entries || entries.length === 0) {
+                    writeLog("Belum ada data ZIP yang dibuka.", "error");
+                    return;
+                }
+                const password = document.getElementById("password").value.trim();
+                const hasil = await simpanSemuaFile(entries, password);
+                for (const [nama, data] of Object.entries(hasil)) {
+                    const blob = data instanceof Blob ? data : new Blob([data]);
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = nama;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                }
+                writeLog("Semua file berhasil disimpan.", "success");
+            } catch (error) {
+                writeLog("Gagal menyimpan: " + error.message, "error");
+            }
+        });
         // ================================
         // Init saat DOM ready
         // ================================
