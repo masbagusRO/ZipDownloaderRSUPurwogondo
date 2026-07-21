@@ -2067,14 +2067,42 @@ RESPONSIVE
 
             UI.log("Mengambil ZIP dari server...");
 
-            const result = await Api.fetchZip(
-                App.fileId
+            const result = await Api.fetchZip(App.fileId);
+
+            console.log("HASIL API:", result);
+
+            // Pastikan data ada
+            if (
+                !result ||
+                typeof result.data !== "string" ||
+                result.data.length === 0
+            ) {
+                throw new Error(
+                    "Server mengembalikan data ZIP kosong."
+                );
+            }
+
+            console.log(
+                "Base64 akan diproses:",
+                result.data.substring(0, 50)
+            );
+
+            console.log(
+                "Panjang Base64:",
+                result.data.length
             );
 
             UI.success("ZIP berhasil diterima.");
 
+            // PERHATIKAN: gunakan result.data
             const blob = ZipHelper.base64ToBlob(
-                result.base64
+                result.data
+            );
+
+            console.log(
+                "Blob berhasil dibuat:",
+                blob.size,
+                blob.type
             );
 
             await ZipManager.open(blob);
