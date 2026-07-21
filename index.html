@@ -1927,7 +1927,16 @@ RESPONSIVE
                         }
 
                         const json = await response.json();
+                        console.log("API JSON:", json);
 
+                        console.log("success:", json.success);
+                        console.log("name:", json.name);
+                        console.log("data type:", typeof json.data);
+                        console.log("data length:", json.data ? json.data.length : 0);
+                        console.log(
+                            "data first 100:",
+                            json.data ? json.data.substring(0, 100) : ""
+                        );
                         if (!json.success) {
 
                             throw new Error(
@@ -1969,6 +1978,30 @@ RESPONSIVE
 
             base64ToBlob(base64, mime = "application/zip") {
 
+                if (!base64) {
+                    throw new Error("Data Base64 kosong.");
+                }
+
+                console.log("Base64 type:", typeof base64);
+                console.log("Base64 length:", base64.length);
+                console.log("Base64 first 100 chars:", base64.substring(0, 100));
+
+                // Hilangkan whitespace / newline
+                base64 = base64
+                    .replace(/\s/g, "");
+
+                // Kalau response ternyata berupa Data URL
+                if (base64.startsWith("data:")) {
+                    base64 = base64.split(",")[1];
+                }
+
+                // Validasi karakter Base64
+                if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
+                    throw new Error(
+                        "Data yang diterima bukan Base64 valid."
+                    );
+                }
+
                 const binary = atob(base64);
 
                 const length = binary.length;
@@ -1976,9 +2009,7 @@ RESPONSIVE
                 const bytes = new Uint8Array(length);
 
                 for (let i = 0; i < length; i++) {
-
                     bytes[i] = binary.charCodeAt(i);
-
                 }
 
                 return new Blob(
