@@ -2,699 +2,2432 @@
 <html lang="en">
 
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <meta charset="UTF-8">
     <title>ZIP Downloader</title>
     <style>
+        /* =======================================================
+   GOOGLE FONT
+======================================================= */
+
+        :root {
+
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+
+            --success: #16a34a;
+            --success-dark: #15803d;
+
+            --danger: #dc2626;
+
+            --background: #f3f6fb;
+
+            --card: #ffffff;
+
+            --border: #dbe4ee;
+
+            --text: #1f2937;
+
+            --muted: #6b7280;
+
+            --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+
+            --radius: 16px;
+
+        }
+
         * {
+
+            margin: 0;
+
+            padding: 0;
+
             box-sizing: border-box;
+
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f8;
-            color: #333;
-            padding: 20px;
+
+            background: var(--background);
+
+            color: var(--text);
+
+            font-family: 'Inter', sans-serif;
+
+            line-height: 1.5;
+
+        }
+
+        .page {
+
+            width: min(1100px, 95%);
+
+            margin: 40px auto;
+
+        }
+
+        /* =======================================================
+HEADER
+======================================================= */
+
+        .hero {
+
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+
+            color: white;
+
+            border-radius: 20px;
+
+            padding: 28px;
+
             display: flex;
-            justify-content: center;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow: var(--shadow);
+
+            margin-bottom: 25px;
+
         }
 
-        .container {
+        .hero-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+        }
+
+        .logo {
+
+            width: 80px;
+
+            height: 80px;
+
+            border-radius: 50%;
+
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
-            width: 100%;
+
+            padding: 8px;
+
         }
 
-        h2 {
-            text-align: center;
+        .hero h1 {
+
+            font-size: 30px;
+
+            font-weight: 700;
+
+        }
+
+        .hero p {
+
+            opacity: .9;
+
+            margin-top: 6px;
+
+        }
+
+        .badge-online {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 18px;
+
+            background: rgba(255, 255, 255, .15);
+
+            border-radius: 30px;
+
+            backdrop-filter: blur(8px);
+
+        }
+
+        /* =======================================================
+CARD
+======================================================= */
+
+        .card {
+
+            background: var(--card);
+
+            border-radius: var(--radius);
+
+            padding: 28px;
+
+            margin-bottom: 24px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+        .card-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 25px;
+
+        }
+
+        .card-header h2 {
+
+            font-size: 22px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+        .card-header p {
+
+            color: var(--muted);
+
+            margin-top: 6px;
+
+        }
+
+        /* =======================================================
+FORM
+======================================================= */
+
+        .form-group {
+
+            margin-bottom: 22px;
+
+        }
+
+        .form-group label {
+
+            display: block;
+
+            font-weight: 600;
+
             margin-bottom: 10px;
+
         }
 
-        p,
-        ol {
-            line-height: 1.6;
-            color: #555;
+        .optional {
+
+            color: var(--muted);
+
+            font-weight: 400;
+
         }
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
+        .form-group small {
 
-        button {
-            width: 100%;
-            font-size: 1.1em;
-            padding: 12px;
+            display: block;
+
+            color: var(--muted);
+
             margin-top: 8px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
+
         }
 
-        #decompressBtn {
-            background-color: #e67e22;
-            color: white;
-        }
+        .form-group input {
 
-        #decompressBtn:hover {
-            background-color: #d35400;
-        }
-
-        #downloadBtn {
-            background-color: #3498db;
-            color: white;
-        }
-
-        #downloadBtn:hover {
-            background-color: #2980b9;
-        }
-
-        textarea {
             width: 100%;
-            height: 150px;
-            margin-top: 12px;
-            resize: none;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-family: monospace;
-            background: #f7f9fb;
-            color: #333;
+
+            height: 52px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            padding: 0 16px;
+
+            font-size: 15px;
+
+            transition: .25s;
+
+            outline: none;
+
         }
 
-        #fotoContainer img {
-            max-width: 120px;
-            margin: 5px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+        .form-group input:focus {
+
+            border-color: var(--primary);
+
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+
         }
+
+        .input-group {
+
+            display: flex;
+
+            gap: 10px;
+
+        }
+
+        .input-group input {
+
+            flex: 1;
+
+        }
+
+        .icon-btn {
+
+            width: 52px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #eef4ff;
+
+            color: var(--primary);
+
+            cursor: pointer;
+
+            transition: .2s;
+
+        }
+
+        .icon-btn:hover {
+
+            background: var(--primary);
+
+            color: white;
+
+        }
+
+        /* =======================================================
+BUTTON
+======================================================= */
+
+        .button-row {
+
+            display: flex;
+
+            gap: 15px;
+
+            margin-top: 30px;
+
+        }
+
+        .button-row button {
+
+            flex: 1;
+
+            height: 54px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 10px;
+
+            transition: .25s;
+
+        }
+
+        .btn-primary {
+
+            background: var(--primary);
+
+            color: white;
+
+        }
+
+        .btn-primary:hover {
+
+            background: var(--primary-dark);
+
+        }
+
+        .btn-success {
+
+            background: var(--success);
+
+            color: white;
+
+        }
+
+        .btn-success:hover {
+
+            background: var(--success-dark);
+
+        }
+
+        /* =======================================================
+LOG
+======================================================= */
+
+        #logBox {
+
+            width: 100%;
+
+            height: 220px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: #111827;
+
+            color: #22c55e;
+
+            font-family: Consolas, monospace;
+
+            padding: 18px;
+
+            resize: none;
+
+            outline: none;
+
+            line-height: 1.7;
+
+        }
+
+        /* =======================================================
+RESULT
+======================================================= */
 
         #result {
+
             display: none;
-            font-size: 10px;
-            border: 1px dashed black;
+
+            margin-top: 25px;
+
         }
 
-        /* --- Kop surat --- */
-        .kop-surat {
-            /* background-color: #3498db; */
-            display: grid;
-            grid-template-columns: 100px auto;
-            gap: 5px;
-            border-bottom: 2px solid black;
-            /* margin-bottom: 10px; */
+        .result-card {
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 28px;
+
+            margin-bottom: 24px;
+
+            box-shadow: var(--shadow);
+
         }
 
-        .kop-surat .logo img {
+        /* =======================================================
+REPORT HEADER
+======================================================= */
+
+        .report-header {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+        }
+
+        .report-logo img {
+
             width: 90px;
+
         }
 
-        .kop-surat .instansi {
-            /* grid-column: 2; */
-            text-align: right;
-            line-height: 0.01;
+        .report-title {
+
+            flex: 1;
+
         }
 
-        .kop-surat .instansi h1 {
-            font-size: 14pt;
-            /* margin-bottom: 10px; */
+        .report-title h2 {
+
+            color: var(--primary);
+
+            font-size: 28px;
+
+            margin-bottom: 8px;
+
         }
 
-        /* identitas pasien */
-        /* --- Tabel identitas pasien --- */
-        #IdentitasPasien {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
+        .report-title p {
+
+            color: var(--muted);
+
+            margin: 2px 0;
+
         }
 
-        #IdentitasPasien col:nth-child(1) {
-            width: 80px;
-        }
+        .section-title {
 
-        #IdentitasPasien col:nth-child(2) {
-            width: 10px;
-        }
-
-        #IdentitasPasien col:nth-child(3) {
-            width: 170px;
-        }
-
-        #IdentitasPasien col:nth-child(4) {
-            width: 120px;
-        }
-
-        #IdentitasPasien col:nth-child(5) {
-            width: 10px;
-        }
-
-        #IdentitasPasien col:nth-child(6) {
-            width: 170px;
-        }
-
-        #IdentitasPasien td {
-            padding: 4px;
-            vertical-align: top;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-
-        #IdentitasPasien td:nth-child(2),
-        #IdentitasPasien td:nth-child(5) {
             text-align: center;
-            white-space: nowrap;
+
+            margin-top: 20px;
+
+            font-size: 24px;
+
+            color: var(--text);
+
+            letter-spacing: 1px;
+
         }
+
+        /* =======================================================
+IDENTITAS
+======================================================= */
+
+        .patient-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 18px;
+
+            margin-top: 20px;
+
+        }
+
+        .patient-grid>div {
+
+            background: #f8fafc;
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            padding: 16px;
+
+        }
+
+        .patient-grid span {
+
+            display: block;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            margin-bottom: 6px;
+
+        }
+
+        .patient-grid strong {
+
+            display: block;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            color: var(--text);
+
+            word-break: break-word;
+
+        }
+
+        /* =======================================================
+HASIL PEMERIKSAAN
+======================================================= */
 
         #HasilPemeriksaan {
-            border: 1px solid black;
-            padding: 5px;
+
+            margin-top: 18px;
+
+            background: #fafafa;
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            padding: 20px;
+
             white-space: pre-wrap;
+
             word-break: break-word;
-            overflow-wrap: break-word;
-            margin: 10px 0;
-            margin: 0 5px;
+
+            font-family: Consolas, monospace;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+
         }
 
-        /* --- Tabel petugas --- */
-        #KolomPetugas {
+        /* =======================================================
+PETUGAS
+======================================================= */
+
+        .doctor-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 18px;
+
+        }
+
+        .doctor-card {
+
+            text-align: center;
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            background: #f9fbfd;
+
+        }
+
+        .doctor-card span {
+
+            display: block;
+
+            color: var(--muted);
+
+            margin-bottom: 12px;
+
+        }
+
+        .doctor-card strong {
+
+            display: block;
+
+            font-size: 17px;
+
+            color: var(--text);
+
+        }
+
+        /* =======================================================
+GALERI
+======================================================= */
+
+        .gallery-header {
+
+            margin-bottom: 20px;
+
+        }
+
+        .gallery-header h4 {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 8px;
+
+        }
+
+        .gallery-header p {
+
+            color: var(--muted);
+
+        }
+
+        #resultImages {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+
+            gap: 18px;
+
+        }
+
+        #resultImages a {
+
+            text-decoration: none;
+
+        }
+
+        #resultImages img {
+
             width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin-top: 15px;
+
+            aspect-ratio: 1;
+
+            object-fit: cover;
+
+            border-radius: 16px;
+
+            border: 1px solid var(--border);
+
+            transition: .25s;
+
+            cursor: pointer;
+
+            background: #fff;
+
+        }
+
+        #resultImages img:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow: 0 15px 35px rgba(0, 0, 0, .15);
+
+        }
+
+        /* =======================================================
+DOWNLOAD BUTTON
+======================================================= */
+
+        .btn-download-all {
+
+            width: 100%;
+
+            height: 58px;
+
+            border: none;
+
+            border-radius: 16px;
+
+            background: var(--success);
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: .25s;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+        .btn-download-all:hover {
+
+            background: var(--success-dark);
+
+        }
+
+        /* =======================================================
+FOOTER
+======================================================= */
+
+        .footer {
+
+            text-align: center;
+
+            color: var(--muted);
+
+            padding: 25px 0 50px;
+
+        }
+
+        .footer p {
+
+            font-weight: 600;
+
+            margin-bottom: 6px;
+
+        }
+
+        /* =======================================================
+LOADING
+======================================================= */
+
+        .loading-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, .45);
+
+            backdrop-filter: blur(5px);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            z-index: 99999;
+
+        }
+
+        .loading-card {
+
+            width: 320px;
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 35px;
+
+            text-align: center;
+
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+
+        }
+
+        .loading-card h3 {
+
+            margin-top: 20px;
+
+            margin-bottom: 8px;
+
+        }
+
+        .loading-card p {
+
+            color: var(--muted);
+
+        }
+
+        .spinner {
+
+            width: 60px;
+
+            height: 60px;
+
+            margin: auto;
+
+            border: 6px solid #dbeafe;
+
+            border-top: 6px solid var(--primary);
+
+            border-radius: 50%;
+
+            animation: spin .9s linear infinite;
+
+        }
+
+        @keyframes spin {
+
+            from {
+
+                transform: rotate(0deg);
+
+            }
+
+            to {
+
+                transform: rotate(360deg);
+
+            }
+
+        }
+
+        /* =======================================================
+SCROLLBAR
+======================================================= */
+
+        ::-webkit-scrollbar {
+
+            width: 10px;
+
+        }
+
+        ::-webkit-scrollbar-thumb {
+
+            background: #cbd5e1;
+
+            border-radius: 10px;
+
+        }
+
+        ::-webkit-scrollbar-track {
+
+            background: #f1f5f9;
+
+        }
+
+        /* =======================================================
+RESPONSIVE
+======================================================= */
+
+        @media(max-width:900px) {
+
+            .hero {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 20px;
+
+            }
+
+            .hero-right {
+
+                width: 100%;
+
+            }
+
+            .badge-online {
+
+                width: 100%;
+
+                justify-content: center;
+
+            }
+
+            .patient-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .doctor-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+        @media(max-width:700px) {
+
+            .page {
+
+                width: 94%;
+
+                margin: 20px auto;
+
+            }
+
+            .hero {
+
+                padding: 22px;
+
+            }
+
+            .hero-left {
+
+                flex-direction: column;
+
+                text-align: center;
+
+                width: 100%;
+
+            }
+
+            .hero h1 {
+
+                font-size: 24px;
+
+            }
+
+            .button-row {
+
+                flex-direction: column;
+
+            }
+
+            .input-group {
+
+                flex-direction: column;
+
+            }
+
+            .icon-btn {
+
+                width: 100%;
+
+                height: 50px;
+
+            }
+
+            .report-header {
+
+                flex-direction: column;
+
+                text-align: center;
+
+            }
+
+            .report-logo img {
+
+                width: 70px;
+
+            }
+
+            .report-title h2 {
+
+                font-size: 24px;
+
+            }
+
+            #resultImages {
+
+                grid-template-columns: 1fr;
+
+            }
+
         }
     </style>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> -->
 </head>
 
 <body>
-    <div class="container">
-        <h2>Radiologi RSU purwogondo</h2>
-        <p>Prosedur penggunaan:</p>
-        <ol>
-            <li>gunakanlah google chrome atau firefox versi terbaru</li>
-            <li>Masukkan password pada kotak input</li>
-            <li>Pilih "Lihat tanpa unduh" untuk melihat hasil roentgen.</li>
-            <li>Atau pilih "Unduh saja" untuk langsung download file roentgen.</li>
-            <li>Periksa kotak log untuk status dan pesan error.</li>
-            <li>disarankan menekan tombol "Unduh saja" jika terjadi error pada tombol "Lihat tanpa unduh"</li>
-            <li>password ada di lembar yang diberikan oleh petugas radiologi</li>
-        </ol>
+    <div class="page">
 
-        <p><strong>File ID:</strong> <span id="fileIdDisplay">-</span></p>
-        <p><strong>URL file ZIP Google Drive:</strong></p>
-        <input type="text" id="fileUrlDisplay" readonly>
+        <!-- ====================================================== -->
+        <!-- HEADER -->
+        <!-- ====================================================== -->
 
-        <input type="text" id="password" placeholder="Masukkan password">
+        <header class="hero">
 
-        <button id="decompressBtn">Lihat tanpa unduh</button>
-        <button id="downloadBtn">Unduh saja (.ZIP)</button>
+            <div class="hero-left">
 
-        <p><strong>Log:</strong></p>
-        <textarea id="logBox" readonly></textarea>
+                <img src="https://raw.githubusercontent.com/masbagusRO/ZipDownloaderRSUPurwogondo/refs/heads/main/logo.webp"
+                    alt="Logo RSU" class="logo">
 
-        <div id="result" style="margin-top:20px;">
-            <div class="kop-surat">
-                <!-- <div class="logo">{{{logoHtml}}}</div> -->
-                <div class="logo"><img
-                        src="https://raw.githubusercontent.com/masbagusRO/ZipDownloaderRSUPurwogondo/refs/heads/main/logo.webp"
-                        alt="RSU PWG"></div>
-                <div class="instansi">
+                <div>
+
                     <h1>RSU PURWOGONDO</h1>
-                    <p>Jl. Puring km.8 Kalipurwo, Kuwarasan, Kebumen, Jawa Tengah</p>
-                    <p>(0287) 472588 / 4760192</p>
-                    <p>Email: rsu.purwogondo@yahoo.co.id</p>
+
+                    <p>
+                        Sistem Hasil Pemeriksaan Radiologi
+                    </p>
+
                 </div>
+
             </div>
-            <p style="text-align: center; margin-bottom: 5pt; font-weight: bold;">Hasil Pemeriksaan Radiologi</p>
-            <table id="IdentitasPasien">
-                <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <td>No. RM</td>
-                        <td>:</td>
-                        <td id="noRM">{{noRM}}</td>
-                        <td>Penanggung Jawab</td>
-                        <td>:</td>
-                        <td id="DokterRadiologi">{{DokterRadiologi}}</td>
-                    </tr>
-                    <tr>
-                        <td>Nama</td>
-                        <td>:</td>
-                        <td id="namaPasien">{{namaPasien}}</td>
-                        <td>Dokter Pengirim</td>
-                        <td>:</td>
-                        <td id="DokterPengirim">{{DokterPengirim}}</td>
-                    </tr>
-                    <tr>
-                        <td>JK/Umur</td>
-                        <td>:</td>
-                        <td><span id="jenisKelamin">{{jenisKelamin}}</span> / <span id="Umur">{{Umur}}</span></td>
-                        <td>Tgl.Pemeriksaan</td>
-                        <td>:</td>
-                        <td id="TglPemeriksaan">{{TglPemeriksaan}}</td>
-                    </tr>
-                    <tr>
-                        <td>Alamat</td>
-                        <td>:</td>
-                        <td id="Alamat">{{Alamat}}</td>
-                        <td>Jam Pemeriksaan</td>
-                        <td>:</td>
-                        <td id="JamPemeriksaan">{{JamPemeriksaan}}</td>
-                    </tr>
-                    <tr>
-                        <td>No. Periksa</td>
-                        <td>:</td>
-                        <td id="NoPeriksa">{{NoPeriksa}}</td>
-                        <td>Poli/Kamar</td>
-                        <td>:</td>
-                        <td id="Ruangan">{{Ruangan}}</td>
-                    </tr>
-                    <tr>
-                        <td>Pemeriksaan</td>
-                        <td>:</td>
-                        <td colspan="4" id="pemeriksaan">{{pemeriksaan}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="margin-top: 10px;">Hasil Pemeriksaan :</p>
-            <div>
-                <pre id="HasilPemeriksaan" style = "font-size: 10px;">{{HasilPemeriksaan}}</pre>
+
+            <div class="hero-right">
+
+                <span class="badge-online">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    Secure Connection
+
+                </span>
+
             </div>
-            <table id="KolomPetugas">
-                <colgroup>
-                    <col>
-                    <col>
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <!-- <td style="text-align: left;">Tgl. Cetak {{tglCetak}}</td> -->
-                        <td>Tgl. Upload <span id="tglUpload">{{tglUpload}}</span></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Penanggung Jawab</td>
-                        <td>Petugas Radiologi</td>
-                    </tr>
-                    <tr>
-                        <td id="DokterRadiologi1">{{DokterRadiologi}}</td>
-                        <td id="PetugasRadiologi">{{PetugasRadiologi}}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="text-align: center; padding-top: 10px;"><strong>!!! <br> Web ini
-                                Digunakan untuk membantu melihat hasil radiologi<br>!!!</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><b>klik gambar untuk melihat gambar di tab baru atau tekan "Simpan Semua" untuk menyimpan gambar dan text.</b></p>
-            <div id="resultImages"></div>
-            <p style="text-align: center;"><strong>!!!Perhatian!!!</strong></p>
-            <ol>
-                <li>file yang diunduh bisa lebih dari 1 file</li>
-                <li>file foto tersimpan dalam format ".jpeg" dan data diri pasien tersimpan dalam format ".txt" </li>
-                <li>aktifkan multiple/Parallel downloading agar bisa mengunduh semua file sekaligus</li>
-                <li>untuk mengaktifkan multiple/Parallel downloading, buka halaman " chrome://flags/#enable-parallel-downloading " lalu ubah menjadi enabled/aktifkan</li>
-            </ol>
-            <button id="saveAllBtn" style="background-color:#2ecc71; color:white;">UNDUH FOTO</button>
+
+        </header>
+
+
+        <!-- ====================================================== -->
+        <!-- CARD -->
+        <!-- ====================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+
+                        <i class="bi bi-folder2-open"></i>
+
+                        Informasi Pemeriksaan
+
+                    </h2>
+
+                    <p>
+                        Masukkan password apabila file ZIP menggunakan password.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILE ID -->
+
+            <div class="form-group">
+
+                <label>
+
+                    File ID
+
+                </label>
+
+                <div class="input-group">
+
+                    <input type="text" id="fileIdDisplay" readonly>
+
+                    <button class="icon-btn" id="copyFileId">
+
+                        <i class="bi bi-copy"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- URL -->
+
+            <div class="form-group">
+
+                <label>
+
+                    Link Google Drive
+
+                </label>
+
+                <input type="text" id="fileUrlDisplay" readonly>
+
+            </div>
+
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label>
+
+                    Password ZIP
+
+                    <span class="optional">
+
+                        (Opsional)
+
+                    </span>
+
+                </label>
+
+
+                <div class="input-group">
+
+                    <input type="password" id="password" placeholder="Kosongkan jika ZIP tidak memakai password">
+
+                    <button id="togglePassword" class="icon-btn" type="button">
+
+                        <i class="bi bi-eye"></i>
+
+                    </button>
+
+                </div>
+
+                <small>
+
+                    Password hanya diperlukan jika file ZIP dienkripsi.
+
+                </small>
+
+            </div>
+
+
+
+            <!-- BUTTON -->
+
+            <div class="button-row">
+
+                <button id="decompressBtn" class="btn-primary">
+
+                    <i class="bi bi-eye-fill"></i>
+
+                    Lihat Pemeriksaan
+
+                </button>
+
+
+                <button id="downloadBtn" class="btn-success">
+
+                    <i class="bi bi-download"></i>
+
+                    Unduh ZIP
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+
+        <!-- ====================================================== -->
+        <!-- STATUS -->
+        <!-- ====================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+
+                        <i class="bi bi-activity"></i>
+
+                        Status
+
+                    </h2>
+
+                    <p>
+
+                        Proses pengambilan data akan ditampilkan di bawah ini.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <textarea id="logBox" readonly>
+
+        </textarea>
+
+        </section>
+
+
+
+
+        <!-- ====================================================== -->
+        <!-- LOADING -->
+        <!-- ====================================================== -->
+
+        <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+
+            <div class="loading-card">
+
+                <div class="spinner"></div>
+
+                <h3>
+
+                    Sedang Memproses
+
+                </h3>
+
+                <p>
+
+                    Mohon tunggu...
+
+                </p>
+
+            </div>
+
         </div>
+
+
+
+        <!-- ====================================================== -->
+        <!-- RESULT -->
+        <!-- ====================================================== -->
+
+        <div id="result" style="display:none;">
+            <!-- ====================================================== -->
+            <!-- HASIL PEMERIKSAAN -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <div class="report-header">
+
+                    <div class="report-logo">
+
+                        <img src="https://raw.githubusercontent.com/masbagusRO/ZipDownloaderRSUPurwogondo/refs/heads/main/logo.webp"
+                            alt="Logo">
+
+                    </div>
+
+                    <div class="report-title">
+
+                        <h2>RSU PURWOGONDO</h2>
+
+                        <p>
+
+                            Jl. Puring KM 8 Kalipurwo, Kuwarasan, Kebumen
+
+                        </p>
+
+                        <p>
+
+                            Telp. (0287) 472588
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h3 class="section-title">
+
+                    HASIL PEMERIKSAAN RADIOLOGI
+
+                </h3>
+
+            </section>
+
+
+
+            <!-- ====================================================== -->
+            <!-- IDENTITAS -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <h4>
+
+                    <i class="bi bi-person-vcard"></i>
+
+                    Identitas Pasien
+
+                </h4>
+
+                <div class="patient-grid">
+
+                    <div>
+
+                        <span>No RM</span>
+
+                        <strong id="noRM"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Dokter Radiologi</span>
+
+                        <strong id="DokterRadiologi"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Nama Pasien</span>
+
+                        <strong id="namaPasien"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Dokter Pengirim</span>
+
+                        <strong id="DokterPengirim"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Jenis Kelamin</span>
+
+                        <strong id="jenisKelamin"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Tanggal Pemeriksaan</span>
+
+                        <strong id="TglPemeriksaan"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Umur</span>
+
+                        <strong id="Umur"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Jam Pemeriksaan</span>
+
+                        <strong id="JamPemeriksaan"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Alamat</span>
+
+                        <strong id="Alamat"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Ruangan</span>
+
+                        <strong id="Ruangan"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>No Periksa</span>
+
+                        <strong id="NoPeriksa"></strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>Pemeriksaan</span>
+
+                        <strong id="pemeriksaan"></strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+
+            <!-- ====================================================== -->
+            <!-- HASIL -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <h4>
+
+                    <i class="bi bi-file-earmark-medical"></i>
+
+                    Hasil Pemeriksaan
+
+                </h4>
+
+                <pre id="HasilPemeriksaan"></pre>
+
+            </section>
+
+
+
+
+            <!-- ====================================================== -->
+            <!-- PETUGAS -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <div class="doctor-grid">
+
+                    <div class="doctor-card">
+
+                        <span>
+
+                            Penanggung Jawab
+
+                        </span>
+
+                        <strong id="DokterRadiologi1"></strong>
+
+                    </div>
+
+                    <div class="doctor-card">
+
+                        <span>
+
+                            Petugas Radiologi
+
+                        </span>
+
+                        <strong id="PetugasRadiologi"></strong>
+
+                    </div>
+
+                    <div class="doctor-card">
+
+                        <span>
+
+                            Tanggal Upload
+
+                        </span>
+
+                        <strong id="tglUpload"></strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+
+            <!-- ====================================================== -->
+            <!-- FOTO -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <div class="gallery-header">
+
+                    <h4>
+
+                        <i class="bi bi-images"></i>
+
+                        Foto Pemeriksaan
+
+                    </h4>
+
+                    <p>
+
+                        Klik gambar untuk melihat ukuran penuh.
+
+                    </p>
+
+                </div>
+
+                <div id="resultImages"></div>
+
+            </section>
+
+
+
+
+            <!-- ====================================================== -->
+            <!-- DOWNLOAD -->
+            <!-- ====================================================== -->
+
+            <section class="result-card">
+
+                <button id="saveAllBtn" class="btn-download-all">
+
+                    <i class="bi bi-download"></i>
+
+                    Unduh Semua Foto
+
+                </button>
+
+            </section>
+
+
+
+
+            <!-- ====================================================== -->
+            <!-- FOOTER -->
+            <!-- ====================================================== -->
+
+            <footer class="footer">
+
+                <p>
+
+                    RSU Purwogondo
+
+                </p>
+
+                <small>
+
+                    Sistem Hasil Pemeriksaan Radiologi
+
+                </small>
+
+            </footer>
+
+        </div>
+
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js/dist/zip.js"></script>
     <script>
-        let fileId, entries;
-        const resultImages = document.getElementById("resultImages");
-        // ================================
-        // Ambil fileId dari URL
-        // ================================
-        function getFileIdFromURL() {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const fileId = params.get("fileId");
+        // ======================================================
+        // CONFIG
+        // ======================================================
 
-                if (!fileId) {
-                    throw new Error("fileId tidak ditemukan di URL.");
+        const API_URLS = [
+
+            "URL_GOOGLE_APPS_SCRIPT_1",
+            "URL_GOOGLE_APPS_SCRIPT_2"
+
+        ];
+
+        const App = {
+
+            fileId: "",
+
+            password: "",
+
+            entries: [],
+
+            files: {},
+
+            txtData: {},
+
+            images: []
+
+        };
+
+
+        // ======================================================
+        // ELEMENT
+        // ======================================================
+
+        const el = {
+
+            fileId: document.getElementById("fileIdDisplay"),
+
+            fileUrl: document.getElementById("fileUrlDisplay"),
+
+            password: document.getElementById("password"),
+
+            log: document.getElementById("logBox"),
+
+            result: document.getElementById("result"),
+
+            loading: document.getElementById("loadingOverlay"),
+
+            btnView: document.getElementById("decompressBtn"),
+
+            btnDownload: document.getElementById("downloadBtn"),
+
+            btnSaveAll: document.getElementById("saveAllBtn"),
+
+            btnCopy: document.getElementById("copyFileId"),
+
+            btnTogglePassword: document.getElementById("togglePassword"),
+
+            imageContainer: document.getElementById("resultImages")
+
+        };
+
+
+        // ======================================================
+        // UI
+        // ======================================================
+
+        const UI = {
+
+            showLoading(text = "Sedang memproses...") {
+
+                el.loading.style.display = "flex";
+
+                const p = el.loading.querySelector("p");
+
+                if (p) p.textContent = text;
+
+            },
+
+            hideLoading() {
+
+                el.loading.style.display = "none";
+
+            },
+
+            clearLog() {
+
+                el.log.value = "";
+
+            },
+
+            log(text) {
+
+                el.log.value += "• " + text + "\n";
+
+                el.log.scrollTop = el.log.scrollHeight;
+
+            },
+
+            success(text) {
+
+                el.log.value += "✔ " + text + "\n";
+
+                el.log.scrollTop = el.log.scrollHeight;
+
+            },
+
+            error(text) {
+
+                el.log.value += "✖ " + text + "\n";
+
+                el.log.scrollTop = el.log.scrollHeight;
+
+            },
+
+            showResult() {
+
+                el.result.style.display = "block";
+
+            },
+
+            hideResult() {
+
+                el.result.style.display = "none";
+
+            },
+
+            disableButtons() {
+
+                el.btnView.disabled = true;
+
+                el.btnDownload.disabled = true;
+
+                if (el.btnSaveAll) {
+
+                    el.btnSaveAll.disabled = true;
+
                 }
 
-                return fileId;
-            } catch (err) {
-                console.error("Gagal mengambil fileId:", err.message);
-                return null;
-            }
-        }
+            },
 
-        // ================================
-        // Logging helper
-        // ================================
-        function writeLog(msg, type = "info") {
-            const logBox = document.getElementById('logBox');
-            const time = new Date().toLocaleTimeString();
-            const prefix =
-                type === "error" ? "[ERROR]" :
-                type === "success" ? "[OK]" : "[INFO]";
-            logBox.value += `${prefix} ${time} - ${msg}\n`;
-            logBox.scrollTop = logBox.scrollHeight;
-        }
+            enableButtons() {
 
-        // ================================
-        // Loading state
-        // ================================
-        function setLoading(isLoading) {
-            const btn = document.getElementById("decompressBtn");
-            btn.disabled = isLoading;
-            btn.textContent = isLoading ? "Memproses..." : "Lihat tanpa unduh";
-            // btn.textContent = isLoading ? "Memproses..." : "Download & Dekompresi";
-        }
+                el.btnView.disabled = false;
 
-        // ================================
-        // Isi data pasien dari TXT
-        // ================================
-        function isiDataPasien(text) {
-            const lines = text.split(/\r?\n/);
-            let section = null;
-            let hasilPemeriksaan = [];
+                el.btnDownload.disabled = false;
 
-            lines.forEach(line => {
-                if (line.startsWith("===")) {
-                    if (line.includes("Identitas")) section = "identitas";
-                    else if (line.includes("HasilPemeriksaan")) section = "hasil";
-                    return;
+                if (el.btnSaveAll) {
+
+                    el.btnSaveAll.disabled = false;
+
                 }
 
-                if (section === "identitas") {
-                    const [key, ...rest] = line.split(":");
-                    if (!key || !rest.length) return;
-
-                    const value = rest.join(":").trim();
-                    const cleanKey = key.trim().replace(/\s+/g, "");
-                    const el = document.getElementById(cleanKey);
-                    if (el) el.textContent = value;
-                } else if (section === "hasil") {
-                    hasilPemeriksaan.push(line);
-                }
-            });
-
-            if (hasilPemeriksaan.length > 0) {
-                let hasilText = hasilPemeriksaan.join("\n").replace(/\t/g, "    ");
-                document.getElementById("HasilPemeriksaan").textContent = hasilText;
             }
-        }
 
-        // ================================
-        // Base64 → Uint8Array
-        // ================================
-        function base64ToUint8Array(base64) {
-            if (!base64 || typeof base64 !== "string") {
-                throw new Error("Base64 tidak valid atau kosong");
-            }
-            base64 = base64.replace(/\s/g, "");
-            while (base64.length % 4 !== 0) base64 += "=";
+        };
 
-            try {
-                const binary = atob(base64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                return bytes;
-            } catch (err) {
-                throw new Error("Gagal decode base64: " + err.message);
-            }
-        }
 
-        // ================================
-        // Tampilkan gambar dari ZIP
-        // ================================
-        async function tampilkanGambar(entry, password, containerId) {
-            try {
-                const imgBlob = await entry.getData(new zip.BlobWriter(), {
-                    password
-                });
-                if (!imgBlob) throw new Error("Blob kosong");
+        // ======================================================
+        // HELPER
+        // ======================================================
 
-                let mimeType = imgBlob.type;
-                const filename = entry.filename.trim();
-                if (!mimeType || mimeType === "application/octet-stream") {
-                    if (/\.jpe?g$/i.test(filename)) mimeType = "image/jpeg";
-                    else if (/\.png$/i.test(filename)) mimeType = "image/png";
-                    else if (/\.webp$/i.test(filename)) mimeType = "image/webp";
-                    else if (/\.gif$/i.test(filename)) mimeType = "image/gif";
+        const Helper = {
+
+            getFileId() {
+
+                const params = new URLSearchParams(location.search);
+
+                return params.get("fileId") || "";
+
+            },
+
+            sleep(ms) {
+
+                return new Promise(resolve => setTimeout(resolve, ms));
+
+            },
+
+            copy(text) {
+
+                navigator.clipboard.writeText(text);
+
+            },
+
+            getPasswordOptions() {
+
+                const pwd = el.password.value.trim();
+
+                if (!pwd) {
+
+                    return {};
+
                 }
 
-                const url = URL.createObjectURL(new Blob([imgBlob], {
-                    type: mimeType
-                }));
+                return {
 
-                const link = document.createElement("a");
-                link.href = url;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                //link.download = entry.filename; // coba, nambah nama di tab baru
+                    password: pwd
 
-                const img = document.createElement("img");
-                img.src = url;
-                img.alt = entry.filename;
-                img.style.maxWidth = "200px";
-                img.style.margin = "5px";
+                };
 
-                link.appendChild(img);
-                document.getElementById(containerId).appendChild(link);
-            } catch (err) {
-                writeLog(`Gagal menampilkan gambar ${entry.filename}: ${err.message}`, "error");
             }
-        }
 
-        // ================================
-        // Download & dekompresi
-        // ================================
-        async function downloadAndDecompress() {
-            const password = document.getElementById("password").value.trim();
-            // if (!password) {
-            //     writeLog("Password harus diisi!", "error");
-            //     return;
-            // }
+        };
 
-            if (!fileId) {
-                writeLog("FileId kosong! Pastikan URL memiliki ?fileId=xxx", "error");
+
+        // ======================================================
+        // INIT
+        // ======================================================
+
+        function initPage() {
+
+            App.fileId = Helper.getFileId();
+
+            if (!App.fileId) {
+
+                UI.error("Parameter fileId tidak ditemukan.");
+
+                el.btnView.disabled = true;
+
+                el.btnDownload.disabled = true;
+
                 return;
+
             }
 
-            setLoading(true);
-            writeLog("Mengambil file ZIP dari Google Drive...");
+            el.fileId.value = App.fileId;
+
+            el.fileUrl.value =
+                "https://drive.google.com/file/d/" +
+                App.fileId +
+                "/view";
+
+            UI.success("Siap digunakan.");
+
+        }
 
 
-            const gasUrls = [{
-                    label: "server 1",
-                    url: "https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec"
-                },
-                {
-                    label: "server 2",
-                    url: "https://script.google.com/macros/s/AKfycbxn-HrzatwMiul3S97ThagDv5WnxW8B4rUUbVeopWILSK1YlIoMNeHEBkwtgTyd0VE9_w/exec"
-                }
-            ];
+        // ======================================================
+        // EVENT
+        // ======================================================
+
+        el.btnCopy.addEventListener("click", () => {
+
+            Helper.copy(App.fileId);
+
+            UI.success("File ID berhasil disalin.");
+
+        });
 
 
-            async function fetchWithTimeout(url, timeout = 10000) { // 10 detik
-                const controller = new AbortController();
-                const id = setTimeout(() => controller.abort(), timeout);
+        el.btnTogglePassword.addEventListener("click", () => {
 
-                try {
-                    const res = await fetch(url, {
-                        signal: controller.signal
-                    });
-                    clearTimeout(id);
-                    return res;
-                } catch (err) {
-                    clearTimeout(id);
-                    writeLog("Permintaan ke server gagal: koneksi lambat atau file terlalu besar.", "error");
-                    throw err;
-                }
+            if (el.password.type === "password") {
+
+                el.password.type = "text";
+
+                el.btnTogglePassword.innerHTML =
+                    '<i class="bi bi-eye-slash"></i>';
+
+            } else {
+
+                el.password.type = "password";
+
+                el.btnTogglePassword.innerHTML =
+                    '<i class="bi bi-eye"></i>';
+
             }
 
+        });
 
-            async function fetchZipWithFailover(fileId) {
+
+        // ======================================================
+        // BUTTON
+        // ======================================================
+
+        el.btnView.addEventListener("click", async () => {
+
+            try {
+
+                UI.disableButtons();
+
+                UI.showLoading("Mengambil file ZIP...");
+
+                UI.clearLog();
+
+                await downloadAndOpen();
+
+            } catch (err) {
+
+                console.error(err);
+
+                UI.error(err.message);
+
+            } finally {
+
+                UI.hideLoading();
+
+                UI.enableButtons();
+
+            }
+
+        });
+
+
+        el.btnDownload.addEventListener("click", async () => {
+
+            try {
+
+                UI.disableButtons();
+
+                UI.showLoading("Mengunduh ZIP...");
+
+                await downloadOriginalZip();
+
+            } catch (err) {
+
+                console.error(err);
+
+                UI.error(err.message);
+
+            } finally {
+
+                UI.hideLoading();
+
+                UI.enableButtons();
+
+            }
+
+        });
+
+
+        // ======================================================
+
+        initPage();
+        // ======================================================
+        // API
+        // ======================================================
+
+        const Api = {
+
+            async fetchZip(fileId) {
+
                 let lastError = null;
 
-                for (const {
-                        label,
-                        url
-                    } of gasUrls) {
-                    const fullUrl = `${url}?fileId=${encodeURIComponent(fileId)}`;
+                for (const endpoint of API_URLS) {
+
                     try {
-                        // const res = await fetch(fullUrl);
-                        const res = await fetchWithTimeout(fullUrl, 180000);
 
-                        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+                        UI.log(`Menghubungi server...`);
 
-                        const json = await res.json();
-                        if (!json.success || !json.data) {
-                            throw new Error(json.message || "Base64 data kosong / tidak valid");
+                        const response = await fetch(endpoint, {
+
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                fileId
+                            })
+
+                        });
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                `HTTP ${response.status}`
+                            );
+
                         }
 
-                        // ✅ Jika sukses, log dan return
-                        writeLog(`Berhasil ambil ZIP menggunakan ${label}`, "success");
+                        const json = await response.json();
+
+                        if (!json.success) {
+
+                            throw new Error(
+                                json.message || "Server Error"
+                            );
+
+                        }
+
+                        UI.success("Server berhasil dihubungi.");
+
                         return json;
 
                     } catch (err) {
-                        console.warn(`Gagal fetch dari ${label}:`, err.message);
+
                         lastError = err;
+
+                        UI.error(
+                            "Server gagal, mencoba server berikutnya..."
+                        );
+
                     }
+
                 }
 
-                // ❌ Jika semua gagal
-                throw new Error(`Semua server gagal/penuh: ${lastError.message}`);
-            }
+                throw lastError;
+
+            },
+
+        };
 
 
-            try {
-                //const url = `https://script.google.com/macros/s/AKfycbx7SKC07GhMapbyhVCl-e7IswbfXLlKrOxbG2MmduFi6QcWhxxKVWVHbYWr28sU_8UVmw/exec?fileId=${fileId}`;
-                //const fileId = getFileIdFromURL();
-                const json = await fetchZipWithFailover(fileId);
-                // if (!res.ok) throw new Error("Gagal fetch ZIP dari GAS");
+        // ======================================================
+        // HELPER
+        // ======================================================
 
-                // const json = await res.json();
-                if (!json.success || !json.data) {
-                    throw new Error(json.message || "Data base64 kosong / tidak valid");
+        const ZipHelper = {
+
+            base64ToBlob(base64, mime = "application/zip") {
+
+                const binary = atob(base64);
+
+                const length = binary.length;
+
+                const bytes = new Uint8Array(length);
+
+                for (let i = 0; i < length; i++) {
+
+                    bytes[i] = binary.charCodeAt(i);
+
                 }
 
-                const arrayBuffer = base64ToUint8Array(json.data);
-
-                // Reset hasil lama
-                resultImages.innerHTML = "";
-                document.getElementById("HasilPemeriksaan").textContent = "";
-
-                // Buka ZIP
-                const blob = new Blob([arrayBuffer], {
-                    type: "application/zip"
-                });
-                const reader = new zip.ZipReader(new zip.BlobReader(blob));
-
-                entries = await reader.getEntries({
-                    password
-                });
-                if (entries.length === 0) {
-                    throw new Error("ZIP kosong atau password salah");
-                }
-
-                let teksDitemukan = false;
-                let gambarDitemukan = false;
-
-                for (const entry of entries) {
-                    if (entry.filename.endsWith(".txt")) {
-                        const text = await entry.getData(new zip.TextWriter(), {
-                            password
-                        });
-                        isiDataPasien(text);
-                        teksDitemukan = true;
-                    } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(entry.filename)) {
-                        await tampilkanGambar(entry, password, "resultImages");
-                        gambarDitemukan = true;
+                return new Blob(
+                    [bytes], {
+                        type: mime
                     }
-                }
+                );
 
-                if (teksDitemukan || gambarDitemukan) {
-                    document.getElementById("result").style.display = "block";
-                    writeLog("Dekompresi berhasil!", "success");
-                } else {
-                    writeLog("Tidak ada file teks atau gambar ditemukan!", "error");
-                }
-
-                await reader.close();
-            } catch (err) {
-                writeLog(err.message, "error");
-            } finally {
-                setLoading(false);
             }
+
+        };
+
+
+        // ======================================================
+        // DOWNLOAD ZIP ORIGINAL
+        // ======================================================
+
+        async function downloadOriginalZip() {
+
+            UI.log("Mengambil ZIP...");
+
+            const result = await Api.fetchZip(App.fileId);
+
+            const blob = ZipHelper.base64ToBlob(
+                result.base64
+            );
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+
+            a.href = url;
+
+            a.download =
+                result.filename ||
+                "Radiologi.zip";
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            a.remove();
+
+            URL.revokeObjectURL(url);
+
+            UI.success("ZIP berhasil diunduh.");
+
         }
 
 
+        // ======================================================
+        // DOWNLOAD DAN BUKA ZIP
+        // ======================================================
 
-        // ================================
-        // Download langsung ZIP dari Drive
-        // ================================
-        function downloadZIPDirect() {
-            if (!fileId) {
-                writeLog("URL kosong atau ID file tidak valid!", "error");
-                return;
-            }
-            const url = `https://drive.google.com/uc?id=${fileId}&export=download`;
-            window.open(url, "_blank");
-            writeLog("Memulai download ZIP langsung...");
+        async function downloadAndOpen() {
+
+            UI.log("Mengambil ZIP dari server...");
+
+            const result = await Api.fetchZip(
+                App.fileId
+            );
+
+            UI.success("ZIP berhasil diterima.");
+
+            const blob = ZipHelper.base64ToBlob(
+                result.base64
+            );
+
+            await ZipManager.open(blob);
+
         }
+        // ======================================================
+        // ZIP MANAGER
+        // ======================================================
 
+        const ZipManager = {
 
-        async function simpanSemuaFile(entries, password) {
-            const hasil = {};
-            for (const entry of entries) {
-                if (entry.directory) continue;
-                if (/\.(txt|csv|json)$/i.test(entry.filename)) {
-                    hasil[entry.filename] = await entry.getData(new zip.TextWriter(), {
-                        password
-                    });
-                } else if (/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(entry.filename)) {
-                    hasil[entry.filename] = await entry.getData(new zip.BlobWriter(), {
-                        password
-                    });
-                } else {
-                    hasil[entry.filename] = await entry.getData(new zip.Uint8ArrayWriter(), {
-                        password
-                    });
+            async open(blob) {
+
+                UI.log("Membuka ZIP...");
+
+                const reader = new zip.ZipReader(
+                    new zip.BlobReader(blob)
+                );
+
+                try {
+
+                    const options = Helper.getPasswordOptions();
+
+                    App.entries = await reader.getEntries(options);
+
+                    UI.success(
+                        `${App.entries.length} file ditemukan.`
+                    );
+
+                    await this.extract();
+
+                } finally {
+
+                    await reader.close();
+
                 }
-            }
-            return hasil;
-        }
 
-        const tombolSimpan = document.getElementById("saveAllBtn");
-        tombolSimpan.addEventListener("click", async () => {
-            writeLog("Mencoba menyimpan semua file...");
-            try {
-                if (!entries || entries.length === 0) {
-                    writeLog("Belum ada data ZIP yang dibuka.", "error");
+            },
+
+
+
+            async extract() {
+
+                App.files = {};
+
+                App.images = [];
+
+                App.txtData = {};
+
+                el.imageContainer.innerHTML = "";
+
+                UI.log("Mengekstrak file...");
+
+                for (const entry of App.entries) {
+
+                    if (entry.directory) {
+
+                        continue;
+
+                    }
+
+                    await this.readEntry(entry);
+
+                }
+
+                UI.success("Ekstraksi selesai.");
+
+                Parser.render();
+
+                Gallery.render();
+
+                UI.showResult();
+
+            },
+
+
+
+            async readEntry(entry) {
+
+                const options = Helper.getPasswordOptions();
+
+                const ext =
+                    entry.filename
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
+
+                switch (ext) {
+
+                    case "txt":
+
+                    {
+
+                        UI.log(
+                            `Membaca ${entry.filename}`
+                        );
+
+                        const text =
+                            await entry.getData(
+
+                                new zip.TextWriter(),
+
+                                options
+
+                            );
+
+                        App.files[
+                            entry.filename
+                        ] = text;
+
+                        Parser.parse(text);
+
+                    }
+
+                    break;
+
+                case "jpg":
+
+                case "jpeg":
+
+                case "png":
+
+                case "bmp":
+
+                case "webp":
+
+                {
+
+                    UI.log(
+                        `Membaca ${entry.filename}`
+                    );
+
+                    const blob =
+                        await entry.getData(
+
+                            new zip.BlobWriter(),
+
+                            options
+
+                        );
+
+                    App.files[
+                        entry.filename
+                    ] = blob;
+
+                    App.images.push({
+
+                        filename: entry.filename,
+
+                        blob
+
+                    });
+
+                }
+
+                break;
+
+                default:
+
+                {
+
+                    const blob =
+                        await entry.getData(
+
+                            new zip.BlobWriter(),
+
+                            options
+
+                        );
+
+                    App.files[
+                        entry.filename
+                    ] = blob;
+
+                }
+
+                }
+
+            }
+
+        };
+
+
+        // ======================================================
+        // GALLERY
+        // ======================================================
+
+        const Gallery = {
+
+            render() {
+
+                el.imageContainer.innerHTML = "";
+
+                if (!App.images.length) {
+
+                    UI.log(
+                        "Tidak ada gambar."
+                    );
+
                     return;
+
                 }
-                const password = document.getElementById("password").value.trim();
-                const hasil = await simpanSemuaFile(entries, password);
-                for (const [nama, data] of Object.entries(hasil)) {
-                    const blob = data instanceof Blob ? data : new Blob([data]);
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = nama;
-                    link.click();
-                    URL.revokeObjectURL(link.href);
+
+                UI.success(
+                    `${App.images.length} gambar ditemukan.`
+                );
+
+                for (const image of App.images) {
+
+                    const url =
+                        URL.createObjectURL(
+                            image.blob
+                        );
+
+                    const card =
+                        document.createElement("a");
+
+                    card.href = url;
+
+                    card.target = "_blank";
+
+                    const img =
+                        document.createElement("img");
+
+                    img.src = url;
+
+                    img.loading = "lazy";
+
+                    img.alt = image.filename;
+
+                    card.appendChild(img);
+
+                    el.imageContainer.appendChild(card);
+
                 }
-                writeLog("Semua file berhasil disimpan.", "success");
-            } catch (error) {
-                writeLog("Gagal menyimpan: " + error.message, "error");
+
             }
-        });
-        // ================================
-        // Init saat DOM ready
-        // ================================
-        window.addEventListener('DOMContentLoaded', () => {
-            fileId = getFileIdFromURL();
-            document.getElementById('fileIdDisplay').textContent = fileId || "-";
-            document.getElementById('fileUrlDisplay').value = fileId ?
-                `https://drive.google.com/uc?id=${fileId}&export=download` : "-";
 
-            document.getElementById('decompressBtn').onclick = downloadAndDecompress;
-            document.getElementById('downloadBtn').onclick = downloadZIPDirect;
-        });
+        };
+        // ======================================================
+        // PARSER
+        // ======================================================
+
+        const FIELD_MAP = {
+
+            "NO RM": "noRM",
+
+            "NAMA PASIEN": "namaPasien",
+
+            "JENIS KELAMIN": "jenisKelamin",
+
+            "UMUR": "Umur",
+
+            "ALAMAT": "Alamat",
+
+            "NO PERIKSA": "NoPeriksa",
+
+            "PEMERIKSAAN": "pemeriksaan",
+
+            "RUANGAN": "Ruangan",
+
+            "DOKTER PENGIRIM": "DokterPengirim",
+
+            "DOKTER RADIOLOGI": "DokterRadiologi",
+
+            "PETUGAS RADIOLOGI": "PetugasRadiologi",
+
+            "TANGGAL PEMERIKSAAN": "TglPemeriksaan",
+
+            "JAM PEMERIKSAAN": "JamPemeriksaan",
+
+            "TANGGAL UPLOAD": "tglUpload"
+
+        };
+
+
+        const Parser = {
+
+            parse(text) {
+
+                App.txtData = {};
+
+                const lines = text.split(/\r?\n/);
+
+                let hasilMode = false;
+
+                let hasil = [];
+
+                for (let line of lines) {
+
+                    line = line.trim();
+
+                    if (!line) {
+
+                        continue;
+
+                    }
+
+                    // ===============================
+                    // HASIL PEMERIKSAAN
+                    // ===============================
+
+                    if (
+                        line.toUpperCase() === "HASIL PEMERIKSAAN"
+                    ) {
+
+                        hasilMode = true;
+
+                        continue;
+
+                    }
+
+                    if (hasilMode) {
+
+                        hasil.push(line);
+
+                        continue;
+
+                    }
+
+                    // ===============================
+                    // KEY : VALUE
+                    // ===============================
+
+                    const index = line.indexOf(":");
+
+                    if (index === -1) {
+
+                        continue;
+
+                    }
+
+                    const key = line
+                        .substring(0, index)
+                        .trim()
+                        .toUpperCase();
+
+                    const value = line
+                        .substring(index + 1)
+                        .trim();
+
+                    if (FIELD_MAP[key]) {
+
+                        App.txtData[
+                            FIELD_MAP[key]
+                        ] = value;
+
+                    }
+
+                }
+
+                App.txtData.HasilPemeriksaan =
+                    hasil.join("\n");
+
+            },
+
+
+
+            render() {
+
+                for (const key in App.txtData) {
+
+                    const element =
+                        document.getElementById(key);
+
+                    if (!element) {
+
+                        continue;
+
+                    }
+
+                    element.textContent =
+                        App.txtData[key];
+
+                }
+
+            }
+
+        };
     </script>
-
-
-
 </body>
 
 </html>
