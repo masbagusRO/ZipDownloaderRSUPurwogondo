@@ -481,10 +481,10 @@
         // ================================
         async function downloadAndDecompress() {
             const password = document.getElementById("password").value.trim();
-            if (!password) {
-                writeLog("Password harus diisi!", "error");
-                return;
-            }
+            // if (!password) {
+            //     writeLog("Password harus diisi!", "error");
+            //     return;
+            // }
 
             if (!fileId) {
                 writeLog("FileId kosong! Pastikan URL memiliki ?fileId=xxx", "error");
