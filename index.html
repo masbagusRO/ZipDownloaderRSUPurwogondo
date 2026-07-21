@@ -1907,20 +1907,15 @@ RESPONSIVE
 
                     try {
 
-                        UI.log(`Menghubungi server...`);
+                        UI.log("Menghubungi server...");
 
-                        const response = await fetch(endpoint, {
+                        const url =
+                            endpoint +
+                            "?fileId=" +
+                            encodeURIComponent(fileId);
 
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                fileId
-                            })
-
+                        const response = await fetch(url, {
+                            method: "GET"
                         });
 
                         if (!response.ok) {
@@ -1947,6 +1942,8 @@ RESPONSIVE
 
                     } catch (err) {
 
+                        console.error("API Error:", err);
+
                         lastError = err;
 
                         UI.error(
@@ -1959,7 +1956,7 @@ RESPONSIVE
 
                 throw lastError;
 
-            },
+            }
 
         };
 
@@ -2006,7 +2003,7 @@ RESPONSIVE
             const result = await Api.fetchZip(App.fileId);
 
             const blob = ZipHelper.base64ToBlob(
-                result.base64
+                result.data
             );
 
             const url = URL.createObjectURL(blob);
@@ -2016,7 +2013,7 @@ RESPONSIVE
             a.href = url;
 
             a.download =
-                result.filename ||
+                result.name ||
                 "Radiologi.zip";
 
             document.body.appendChild(a);
