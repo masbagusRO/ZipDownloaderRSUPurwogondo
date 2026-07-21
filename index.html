@@ -2116,17 +2116,24 @@ RESPONSIVE
 
             async open(blob) {
 
-                UI.log("Membuka ZIP...");
-
-                const reader = new zip.ZipReader(
-                    new zip.BlobReader(blob)
+                UI.log(
+                    "Membuka ZIP..."
                 );
+
+                const reader =
+                    new zip.ZipReader(
+                        new zip.BlobReader(blob)
+                    );
 
                 try {
 
-                    const options = Helper.getPasswordOptions();
+                    const options =
+                        Helper.getPasswordOptions();
 
-                    App.entries = await reader.getEntries(options);
+                    App.entries =
+                        await reader.getEntries(
+                            options
+                        );
 
                     UI.success(
                         `${App.entries.length} file ditemukan.`
@@ -2142,33 +2149,38 @@ RESPONSIVE
 
             },
 
-
-
             async extract() {
 
                 App.files = {};
 
-                App.images = [];
+                App.images = {};
 
                 App.txtData = {};
 
-                el.imageContainer.innerHTML = "";
+                el.imageContainer.innerHTML =
+                    "";
 
-                UI.log("Mengekstrak file...");
+                UI.log(
+                    "Mengekstrak file..."
+                );
 
-                for (const entry of App.entries) {
+                for (
+                    const entry of App.entries
+                ) {
 
                     if (entry.directory) {
-
                         continue;
-
                     }
 
-                    await this.readEntry(entry);
+                    await this.readEntry(
+                        entry
+                    );
 
                 }
 
-                UI.success("Ekstraksi selesai.");
+                UI.success(
+                    "Ekstraksi selesai."
+                );
 
                 Parser.render();
 
@@ -2178,11 +2190,10 @@ RESPONSIVE
 
             },
 
-
-
             async readEntry(entry) {
 
-                const options = Helper.getPasswordOptions();
+                const options =
+                    Helper.getPasswordOptions();
 
                 const ext =
                     entry.filename
@@ -2202,31 +2213,27 @@ RESPONSIVE
 
                         const text =
                             await entry.getData(
-
                                 new zip.TextWriter(),
-
                                 options
-
                             );
 
                         App.files[
                             entry.filename
                         ] = text;
 
-                        Parser.parse(text);
+                        Parser.parse(
+                            text
+                        );
 
                     }
 
                     break;
 
+
                 case "jpg":
-
                 case "jpeg":
-
                 case "png":
-
                 case "bmp":
-
                 case "webp":
 
                 {
@@ -2235,13 +2242,17 @@ RESPONSIVE
                         `Membaca ${entry.filename}`
                     );
 
+                    const mimeType =
+                        this.getMimeType(
+                            entry.filename
+                        );
+
                     const blob =
                         await entry.getData(
-
-                            new zip.BlobWriter(),
-
+                            new zip.BlobWriter(
+                                mimeType
+                            ),
                             options
-
                         );
 
                     App.files[
@@ -2252,7 +2263,7 @@ RESPONSIVE
 
                         filename: entry.filename,
 
-                        blob
+                        blob: blob
 
                     });
 
@@ -2260,17 +2271,15 @@ RESPONSIVE
 
                 break;
 
+
                 default:
 
                 {
 
                     const blob =
                         await entry.getData(
-
                             new zip.BlobWriter(),
-
                             options
-
                         );
 
                     App.files[
@@ -2280,6 +2289,35 @@ RESPONSIVE
                 }
 
                 }
+
+            },
+
+            getMimeType(filename) {
+
+                const ext =
+                    filename
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
+
+                const mimeMap = {
+
+                    jpg: "image/jpeg",
+
+                    jpeg: "image/jpeg",
+
+                    png: "image/png",
+
+                    bmp: "image/bmp",
+
+                    webp: "image/webp"
+
+                };
+
+                return (
+                    mimeMap[ext] ||
+                    "application/octet-stream"
+                );
 
             }
 
@@ -2320,22 +2358,34 @@ RESPONSIVE
                     const card =
                         document.createElement("a");
 
-                    card.href = url;
+                    card.href =
+                        url;
 
-                    card.target = "_blank";
+                    card.target =
+                        "_blank";
+
+                    card.rel =
+                        "noopener";
 
                     const img =
                         document.createElement("img");
 
-                    img.src = url;
+                    img.src =
+                        url;
 
-                    img.loading = "lazy";
+                    img.loading =
+                        "lazy";
 
-                    img.alt = image.filename;
+                    img.alt =
+                        image.filename;
 
-                    card.appendChild(img);
+                    card.appendChild(
+                        img
+                    );
 
-                    el.imageContainer.appendChild(card);
+                    el.imageContainer.appendChild(
+                        card
+                    );
 
                 }
 
